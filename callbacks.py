@@ -2,10 +2,8 @@ from main import app
 from config import all_stations, fnf_stations
 
 from dash.dependencies import ClientsideFunction, Input, Output, State
-from config import df_system_status
 from datetime import datetime, timedelta
-
-fcst_t1 = datetime.fromisoformat(df_system_status['ESP-WWRF Fcst'][0]).date()
+import pandas as pd
 
 ## Callbacks from here on
 
@@ -80,6 +78,14 @@ app.clientside_callback(
     Input('datepicker', 'min_date_allowed'),
     Input('datepicker', 'max_date_allowed')
 )
+
+# update system status periodically
+@app.callback(Output(component_id='datepicker', component_property='max_date_allowed'),
+              Input('interval-check_system', 'n_intervals'))
+def update_system_status(basin):
+    fcsv = 'data/system_status.csv'
+    df_status = pd.read_csv(fcsv, parse_dates=True)
+    return datetime.fromisoformat(df_status['WRF-Hydro NRT'][1]).date()
 
 # callback to switch river vector sources according to zoom level
 app.clientside_callback(

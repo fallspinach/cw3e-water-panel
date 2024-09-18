@@ -2,7 +2,7 @@ import os
 import dash
 import dash_bootstrap_components as dbc
 
-from layout import panel_layout
+from layout import get_layout
 
 
 # some external things
@@ -33,7 +33,7 @@ app.index_string = '''
 </html>
 '''
 
-app.layout = panel_layout
+app.layout = get_layout
 
 from callbacks import *
 
