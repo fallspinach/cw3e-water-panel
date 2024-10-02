@@ -150,7 +150,7 @@ def draw_table_all(fcst_type, fcst_t1, fcst_t2, fcst_update):
 
     return [table_fcst]
 
-def get_popup_plots():
+def get_site_tools():
 
     fcsv = 'data/system_status.csv'
     df_system_status = pd.read_csv(fcsv, parse_dates=True)
@@ -186,7 +186,7 @@ def get_popup_plots():
     tabtitle_selected_style = {'padding': '2px', 'height': '28px', 'font-size': 'small', 'font-weight': 'bold'}
 
     tab_retro = dcc.Tab(label='Retrospective',   value='retro', children=[dcc.Loading(id='loading-retro', children=graph_retro)], style=tabtitle_style, selected_style=tabtitle_selected_style)
-    tab_mofor = dcc.Tab(label='NRT/Forecast',value='mofor', children=[dcc.Loading(id='loading-mofor', children=graph_mofor)], style=tabtitle_style, selected_style=tabtitle_selected_style)
+    tab_mofor = dcc.Tab(label='NRT Monitor/Forecast',value='mofor', children=[dcc.Loading(id='loading-mofor', children=graph_mofor)], style=tabtitle_style, selected_style=tabtitle_selected_style)
     tab_table = dcc.Tab(label='Forecast Table',  value='table', children=[dcc.Loading(id='loading-table', children=div_table)],   style=tabtitle_style, selected_style=tabtitle_selected_style)
 
     popup_tabs = dcc.Tabs([tab_mofor, tab_table, tab_retro], id='popup-tabs', value='mofor')

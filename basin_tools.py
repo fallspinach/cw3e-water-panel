@@ -1,0 +1,61 @@
+from dash import html, dcc
+import dash_bootstrap_components as dbc
+import dash_leaflet as dl
+from dash_extensions.javascript import Namespace, arrow_function
+
+import plotly.express as px
+import plotly.graph_objs as go
+import pandas as pd
+import numpy as np
+from datetime import date, datetime, timedelta
+
+from config import map_tiles, fnf_stations, fnf_id_names, graph_config
+
+# start to build maps
+ns = Namespace('dashExtensions', 'default')
+
+# draw system status chart
+def draw_system_status():
+    fcsv = 'data/system_status.csv'
+    df_system_status = pd.read_csv(fcsv, parse_dates=True)
+    fig_system_status = go.Figure()
+    i = 1
+    for datastream,datatime in df_system_status.items():
+        if datastream not in ['Forcing Retro', 'WRF-Hydro Retro', 'Current']:
+            fig_system_status.add_trace(go.Scatter(x=datatime, y=[i, i], name=datastream, 
+                text=[datastream+' '+datetime.fromisoformat(datatime[0]).strftime('%-m/%-d %HZ'), datastream+' '+datetime.fromisoformat(datatime[1]).strftime('%-m/%-d %HZ')],
+                                                   textposition='top center', line=dict(width=12), mode='lines+text'))
+            i += 1
+        if datastream=='Current':
+            fig_system_status.add_trace(go.Scatter(x=datatime, y=[0.5, i-1], name=datastream, text=['Status Update @ '+datetime.fromisoformat(datatime[1]).strftime('%-m/%-d %HZ'), ''], line=dict(dash='dash'), mode='lines+text'))
+            i += 1
+    fig_system_status.update_traces(hovertemplate='%{x}')
+    fig_system_status.update_layout(title='System Status', showlegend=False, xaxis_range=[datetime.utcnow()-timedelta(days=14), datetime.utcnow()+timedelta(days=3)],
+                                    margin=dict(l=15, r=15, t=35, b=5), plot_bgcolor='#eeeeee', title_font_size=15,
+                                    legend=dict(yanchor='top', y=0.99, xanchor='right', x=0.99, title='Datastream'))
+    fig_system_status.update_xaxes(dtick='D', tickformat='%-m/%-d')
+    fig_system_status.update_yaxes(visible=False)
+    return fig_system_status
+
+def get_basin_tools():
+
+    # tool panel
+    tool_style  = {'min-height': '312px', 'background-color': 'white', 'font-size': 'small', 'border': '1px solid lightgray', 'border-top-style': 'none'}
+
+    fig_system_status = draw_system_status()
+    graph_system_status = dcc.Graph(id='graph-system_status', figure=fig_system_status, style={'height': '310px', 'padding-top': '10px'}, config=graph_config)
+
+    # system status panel
+    system_status_tab = html.Div([dcc.Loading(id='loading-system-status', children=graph_system_status)], style=tool_style)
+
+    tabtitle_style          = {'padding': '2px', 'height': '28px', 'font-size': 'small'}
+    tabtitle_selected_style = {'padding': '2px', 'height': '28px', 'font-size': 'small', 'font-weight': 'bold'}
+
+    basin_tools = html.Div(dcc.Tabs([
+        dcc.Tab(html.Div(['Placeholder 1'], style=tool_style), label='Snowpack',      value='tab-snow', style=tabtitle_style, selected_style=tabtitle_selected_style),
+        dcc.Tab(html.Div(['Placeholder 2'], style=tool_style), label='Soil Moisture', value='tab-sm',   style=tabtitle_style, selected_style=tabtitle_selected_style),
+        dcc.Tab(html.Div(['Placeholder X'], style=tool_style), label='Tool X',        value='tab-x',    style=tabtitle_style, selected_style=tabtitle_selected_style),
+        dcc.Tab([system_status_tab],  label='System Status', value='tab-status', style=tabtitle_style, selected_style=tabtitle_selected_style),
+    ], value='tab-status'))
+
+    return basin_tools
