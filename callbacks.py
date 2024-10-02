@@ -5,6 +5,7 @@ from dash.dependencies import ClientsideFunction, Input, Output, State
 from datetime import datetime, timedelta
 import pandas as pd
 
+from site_tools import draw_retro, draw_mofor, draw_table, draw_table_all
 ## Callbacks from here on
 
 # callback to update data var in the title section
@@ -98,4 +99,34 @@ app.clientside_callback(
     Input('map-region', 'zoom')
 )
 
+# create/update historic time series graph in popup
+@app.callback(Output(component_id='graph-retro', component_property='figure'),
+              Output(component_id='graph-mofor', component_property='figure'),
+              Output(component_id='div-table', component_property='children'),
+              Output('popup-plots', 'is_open'),
+              Output('popup-plots', 'title'),
+              Input('b120-points', 'clickData'),
+              Input('slider_updates', 'value'),
+              Input('radio_pp', 'value'))
+def update_flows(fcst_point, yday_update, pp):
+    fcsv = 'data/system_status.csv'
+    df_system_status = pd.read_csv(fcsv, parse_dates=True)
+    fcst_t1 = datetime.fromisoformat(df_system_status['ESP-WWRF Fcst'][0]).date()
+    fcst_t2 = datetime.fromisoformat(df_system_status['ESP-WWRF Fcst'][1]).date()
+    if fcst_point==None:
+        staid = 'FTO'
+        stain = 'FTO: Feather River at Oroville'
+    else:
+        staid = fcst_point['properties']['Station_ID']
+        stain = fcst_point['properties']['tooltip']
+    fcst_update = datetime(fcst_t1.year, 1, 1) + timedelta(days=yday_update-1)
+    fcst_type = f'{pp}'
+    fig_retro = draw_retro(staid)
+    fig_mofor = draw_mofor(staid, fcst_type, fcst_t1, fcst_t2, fcst_update)
+    if staid!='TNL':
+        table_fcst = draw_table(staid, all_stations[staid], fcst_type, fcst_t1, fcst_t2, fcst_update)
+    else:
+        table_fcst = draw_table_all(fcst_type, fcst_t1, fcst_t2, fcst_update)
+    
+    return [fig_retro, fig_mofor, table_fcst, True, stain]
 
