@@ -117,14 +117,13 @@ def draw_table_all(fcst_type, fcst_t1, fcst_t2, fcst_update):
         df['Date'] = [ datetime.strptime(m, '%Y-%m-%d').strftime('%B %Y') for m in df['Date'] ]
         if fcst_t2.month>=7:
             df.iloc[-1, 0] = df.iloc[-1, 0].replace('July', 'April-July total')
-        #df.insert(loc=0, column='Station', value=[staname if i==0 else '' for i in range(df.shape[0])])
         df.loc[-1] = ['' if i>0 else staname for i in range(df.shape[1])]
         df.index = df.index + 1  # shifting index
-        df.sort_index(inplace=True) 
+        df.sort_index(inplace=True)
         if cnt==0:
             df_all = df
         else:
-            df_all = df_all.append(df, ignore_index=True)
+            df_all = pd.concat([df_all, df], ignore_index=True)
         cnt += 1
     #df_all.drop(df_all.tail(1).index, inplace=True)
     table_fcst = dash_table.DataTable(id='fcst-table',
