@@ -9,7 +9,7 @@ def get_layout():
 
     map_region, control_data_sel, control_time_sel = get_region_tools()
     popup_plots = get_site_tools()
-    basin_tools = get_basin_tools()
+    [basin_tools, basin_popup_plots] = get_basin_tools()
     
     panel_layout = dbc.Container([
             dbc.Row([
@@ -17,7 +17,7 @@ def get_layout():
                 dbc.Col([
                     dbc.Row(control_data_sel),
                     dbc.Row(control_time_sel),
-                    dbc.Row(basin_tools),
+                    dbc.Row([basin_tools, basin_popup_plots]),
                 ], width=4)
             ])
         ], fluid=True,

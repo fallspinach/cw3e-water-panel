@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 from site_tools import draw_retro, draw_mofor, draw_table, draw_table_all
+from basin_tools import draw_basin_ts_nrt
 ## Callbacks from here on
 
 # callback to update data var in the title section
@@ -129,4 +130,20 @@ def update_flows(fcst_point, yday_update, pp):
         table_fcst = draw_table_all(fcst_type, fcst_t1, fcst_t2, fcst_update)
     
     return [fig_retro, fig_mofor, table_fcst, True, stain]
+
+# create/update historic time series graph in popup
+@app.callback(Output(component_id='basin-graph-nrt', component_property='figure'),
+              Output('basin-popup-plots', 'is_open'),
+              Output('basin-popup-plots', 'title'),
+              Input('b120-watersheds', 'clickData'))
+def update_basin(basin):
+    if basin==None:
+        staid = 'FTO'
+        stain = 'FTO: Feather River at Oroville'
+    else:
+        staid = basin['properties']['Station']
+        stain = basin['properties']['tooltip']
+    fig_nrt = draw_basin_ts_nrt(staid)
+    
+    return [fig_nrt, True, stain]
 

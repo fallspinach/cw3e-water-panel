@@ -18,7 +18,7 @@ from config import fnf_stations, fnf_id_names, graph_config
 # flow retro figure
 def draw_retro(staid):
     if staid in fnf_stations:
-        fcsv = f'data/retro/{staid}_monthly.csv'
+        fcsv = f'data/retro/combined/{staid}_monthly.csv'
         df = pd.read_csv(fcsv, parse_dates=True, index_col='Date')
         fig_retro = px.line(df, labels={'Date': '', 'value': 'Flow (kaf/mon)'})
         fig_retro = go.Figure()
@@ -44,7 +44,7 @@ def draw_mofor(staid, fcst_type, fcst_t1, fcst_t2, fcst_update):
         df = pd.read_csv(fcsv, parse_dates=True, index_col='Date', usecols = ['Date']+['Ens%02d' % (i+1) for i in range(nens)]+['Avg', 'Exc50', 'Exc90', 'Exc10'])
         if fcst_t2.month>=7:
             df.drop(index=df.index[-1], axis=0, inplace=True)
-        fcsv2 = f'data/nrt/{staid}_monthly.csv'
+        fcsv2 = f'data/nrt/combined/{staid}_monthly.csv'
         df2 = pd.read_csv(fcsv2, parse_dates=True, index_col='Date', usecols=['Date', 'FNF', 'Qsim', 'Qmatch'])
         fig_mofor = go.Figure()
         for e in range(1, nens+1):
