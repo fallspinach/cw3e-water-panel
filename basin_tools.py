@@ -38,9 +38,9 @@ def draw_system_status():
     return fig_system_status
 
 # draw basin average time series
-def draw_basin_ts_nrt(staid):
+def draw_basin_ts(staid, ptype):
     if staid in fnf_stations:
-        fcsv = f'data/nrt/averaged/{staid}_daily.csv'
+        fcsv = f'data/{ptype}/averaged/{staid}_daily.csv'
         df = pd.read_csv(fcsv, parse_dates=True, index_col='Date')
         fig_nrt = go.Figure()
         fig_nrt.add_trace(go.Bar(x=df.index, y=df['PREC'], name='Precipitation'))
@@ -84,18 +84,19 @@ def get_basin_tools():
     ], value='tab-status'))
 
     ## pop-up window and its tabs/graphs
-    staid0     = 'FTO'
-    staname0   = 'Feather River at Oroville'
-    
-    fig_nrt = draw_basin_ts_nrt(staid0)
-    graph_nrt = dcc.Graph(id='basin-graph-nrt', figure=fig_nrt, style={'height': '360px'}, config=graph_config)
+    staid0     = 'FTO'    
+    fig_nrt    = draw_basin_ts(staid0, 'nrt')
+    fig_retro  = draw_basin_ts(staid0, 'retro')
+    graph_nrt  = dcc.Graph(id='basin-graph-nrt',   figure=fig_nrt,   style={'height': '360px'}, config=graph_config)
+    graph_retro= dcc.Graph(id='basin-graph-retro', figure=fig_retro, style={'height': '360px'}, config=graph_config)
 
     tabtitle_style          = {'padding': '2px', 'height': '28px', 'font-size': 'small'}
     tabtitle_selected_style = {'padding': '2px', 'height': '28px', 'font-size': 'small', 'font-weight': 'bold'}
 
-    tab_nrt = dcc.Tab(label='NRT Monitor',value='basin-nrt', children=[dcc.Loading(id='loading-basin-nrt', children=graph_nrt)], style=tabtitle_style, selected_style=tabtitle_selected_style)
+    tab_nrt   = dcc.Tab(label='NRT Monitor',  value='basin-nrt',   children=[dcc.Loading(id='loading-basin-nrt',  children=graph_nrt)],   style=tabtitle_style, selected_style=tabtitle_selected_style)
+    tab_retro = dcc.Tab(label='Retrospective',value='basin-retro', children=[dcc.Loading(id='loading-basin-retro', children=graph_retro)], style=tabtitle_style, selected_style=tabtitle_selected_style)
 
-    popup_tabs = dcc.Tabs([tab_nrt], id='basin-popup-tabs', value='basin-nrt')
+    popup_tabs = dcc.Tabs([tab_nrt, tab_retro], id='basin-popup-tabs', value='basin-nrt')
     basin_popup_plots = dbc.Offcanvas([popup_tabs],
         title='B-120 Basin', placement='top', is_open=False, scrollable=True, id='basin-popup-plots',
         style={'opacity': '0.9', 'width': '90%', 'min-width': '1000px', 'min-height': '540px', 'margin-top': '150px', 'margin-left': 'auto', 'margin-right': 'auto', 'font-size': 'smaller'}
