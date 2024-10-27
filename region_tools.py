@@ -29,7 +29,7 @@ def get_region_tools():
     # B-120 watersheds
     watershed_style = dict(weight=2, opacity=1, color='darkblue', fillOpacity=0)
     b120_watersheds = dl.GeoJSON(url='assets/fnf_watershed_proj_tooltip_24.pbf', format='geobuf', id='b120-watersheds',
-                                 options=dict(style=ns('b120_style')), zoomToBoundsOnClick=False,
+                                 options=dict(style=ns('b120_style')), zoomToBoundsOnClick=True,
                                  hoverStyle=arrow_function(dict(weight=4, color='brown', dashArray='', fillOpacity=0)),
                                  hideout=dict(colorscale=['darkblue'], classes=[0], style=watershed_style, colorProp='Area_SqMi'))
     # CNRFC region boundary
@@ -43,6 +43,18 @@ def get_region_tools():
                             options=dict(style=ns('river_style')), zoomToBoundsOnClick=True,
                             hoverStyle=arrow_function(dict(weight=4, color='orange', dashArray='', fillOpacity=0)),
                             hideout=dict(colorscale=['black'], classes=[0], style=river_style, colorProp='feature_id'))
+    
+    # B-120 snow courses
+    b120_courses = dl.GeoJSON(url='assets/b120_snow_courses_tooltip.pbf', format='geobuf', id='b120-courses',
+                             options=dict(pointToLayer=ns('b120_ptl')), cluster=False, superClusterOptions=dict(radius=5),
+                             hoverStyle=arrow_function(dict(weight=5, color='red', fillColor='red', dashArray='')),
+                             hideout=dict(circleOptions=dict(fillOpacity=1, color='white', weight=2, radius=3), colorscale=['brown'], colorProp='Elevation', min=0, max=20000))
+    
+    # B-120 snow pillows
+    b120_pillows = dl.GeoJSON(url='assets/b120_snow_pillows_tooltip.pbf', format='geobuf', id='b120-pillows',
+                             options=dict(pointToLayer=ns('b120_ptl')), cluster=False, superClusterOptions=dict(radius=5),
+                             hoverStyle=arrow_function(dict(weight=5, color='red', fillColor='red', dashArray='')),
+                             hideout=dict(circleOptions=dict(fillOpacity=1, color='white', weight=2, radius=3), colorscale=['orange'], colorProp='Elevation', min=0, max=20000))
 
     # image data overlay
     if last_whnrt.month>7 and last_whnrt.month<11:
@@ -61,8 +73,10 @@ def get_region_tools():
     layers_region = [dl.Overlay([data_map, data_cbar], id='data-map-ol',  name='Data',   checked=True),
                      #dl.Overlay(cnrfc_bound,      id='region-ol', name='Region', checked=True),
                      dl.Overlay(nwm_rivers,       id='rivers-ol', name='Rivers', checked=False),
-                     dl.Overlay(b120_watersheds,  id='basins-ol', name='Basins', checked=True),
-                     dl.Overlay(b120_points,      id='sites-ol',  name='Sites',  checked=True)]
+                     dl.Overlay(b120_watersheds,  id='basins-ol', name='B120 Basins', checked=True),
+                     dl.Overlay(b120_points,      id='sites-ol',  name='B120 Sites',  checked=True),
+                     dl.Overlay(b120_courses,     id='courses-ol',  name='Snow Course',  checked=True),
+                     dl.Overlay(b120_pillows,     id='pillows-ol',  name='Snow Pillows',  checked=True)]
                  
     # region map on the left
     map_region = dl.Map([map_tiles[1], locator, dl.LayersControl(layers_region)], id='map-region',

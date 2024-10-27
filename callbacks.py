@@ -7,6 +7,7 @@ import pandas as pd
 
 from site_tools import draw_retro, draw_mofor, draw_table, draw_table_all
 from basin_tools import draw_basin_ts
+from snow_tools import draw_course, draw_pillow
 ## Callbacks from here on
 
 # callback to update data var in the title section
@@ -148,4 +149,36 @@ def update_basin(basin):
     fig_retro = draw_basin_ts(staid, 'retro')
     
     return [fig_nrt, fig_retro, True, stain]
+
+# create/update snow course time series graph in popup
+@app.callback(Output(component_id='snow-graph-course', component_property='figure'),
+              Output('course-popup-plots', 'is_open'),
+              Output('course-popup-plots', 'title'),
+              Input('b120-courses', 'clickData'))
+def update_course(site):
+    if site==None:
+        staid = 'GRZ'
+        stain = 'StationID: GRZ, Name: Grizzly Ridge, Elevation: 6900ft, Basin: Feather River'
+    else:
+        staid = site['properties']['STA']
+        stain = site['properties']['tooltip']
+    fig_course = draw_course(staid)
+    
+    return [fig_course, True, stain]
+
+# create/update snow pillow time series graph in popup
+@app.callback(Output(component_id='snow-graph-pillow', component_property='figure'),
+              Output('pillow-popup-plots', 'is_open'),
+              Output('pillow-popup-plots', 'title'),
+              Input('b120-pillows', 'clickData'))
+def update_pillow(site):
+    if site==None:
+        staid = 'RTL'
+        stain = 'StationID: RTL, Name: Rattlesnake, Elevation: 6210ft, Basin: Feather River'
+    else:
+        staid = site['properties']['STA']
+        stain = site['properties']['tooltip']
+    fig_pillow = draw_pillow(staid)
+    
+    return [fig_pillow, True, stain]
 

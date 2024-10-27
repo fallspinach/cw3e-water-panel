@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from datetime import date, datetime, timedelta
 
-from config import map_tiles, fnf_stations, fnf_id_names, graph_config
+from config import fnf_stations, fnf_id_names, graph_config
 
 # start to build maps
 ns = Namespace('dashExtensions', 'default')
