@@ -151,7 +151,8 @@ def update_basin(basin):
     return [fig_nrt, fig_retro, True, stain]
 
 # create/update snow course time series graph in popup
-@app.callback(Output(component_id='snow-graph-course', component_property='figure'),
+@app.callback(Output(component_id='snow-graph-course-nrt',   component_property='figure'),
+              Output(component_id='snow-graph-course-retro', component_property='figure'),
               Output('course-popup-plots', 'is_open'),
               Output('course-popup-plots', 'title'),
               Input('b120-courses', 'clickData'))
@@ -162,12 +163,14 @@ def update_course(site):
     else:
         staid = site['properties']['STA']
         stain = site['properties']['tooltip']
-    fig_course = draw_course(staid)
+    fig_course_nrt   = draw_course(staid, 'nrt')
+    fig_course_retro = draw_course(staid, 'retro')
     
-    return [fig_course, True, stain]
+    return [fig_course_nrt, fig_course_retro, True, stain]
 
 # create/update snow pillow time series graph in popup
-@app.callback(Output(component_id='snow-graph-pillow', component_property='figure'),
+@app.callback(Output(component_id='snow-graph-pillow-nrt',   component_property='figure'),
+              Output(component_id='snow-graph-pillow-retro', component_property='figure'),
               Output('pillow-popup-plots', 'is_open'),
               Output('pillow-popup-plots', 'title'),
               Input('b120-pillows', 'clickData'))
@@ -178,7 +181,8 @@ def update_pillow(site):
     else:
         staid = site['properties']['STA']
         stain = site['properties']['tooltip']
-    fig_pillow = draw_pillow(staid)
+    fig_pillow_nrt   = draw_pillow(staid, 'nrt')
+    fig_pillow_retro = draw_pillow(staid, 'retro')
     
-    return [fig_pillow, True, stain]
+    return [fig_pillow_nrt, fig_pillow_retro, True, stain]
 

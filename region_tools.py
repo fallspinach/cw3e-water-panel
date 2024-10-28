@@ -29,7 +29,7 @@ def get_region_tools():
     # B-120 watersheds
     watershed_style = dict(weight=2, opacity=1, color='darkblue', fillOpacity=0)
     b120_watersheds = dl.GeoJSON(url='assets/fnf_watershed_proj_tooltip_24.pbf', format='geobuf', id='b120-watersheds',
-                                 options=dict(style=ns('b120_style')), zoomToBoundsOnClick=True,
+                                 options=dict(style=ns('b120_style')), zoomToBoundsOnClick=False,
                                  hoverStyle=arrow_function(dict(weight=4, color='brown', dashArray='', fillOpacity=0)),
                                  hideout=dict(colorscale=['darkblue'], classes=[0], style=watershed_style, colorProp='Area_SqMi'))
     # CNRFC region boundary
