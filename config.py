@@ -5,7 +5,6 @@ import pandas as pd
 from glob import glob
 from datetime import datetime
 
-###############################
 ## global configs
 
 # system status
@@ -19,8 +18,14 @@ df_system_status = pd.read_csv(fcsv, parse_dates=True)
 # image snapshot export options
 graph_config = {'toImageButtonOptions': {'format': 'png', 'filename': 'cw3e_water_panel_plot', 'scale': 3}, 'displaylogo': False} 
 
-###############################
-## region tools section
+# styles
+tool_style = {'min-height': '312px', 'background-color': 'white', 'font-size': 'small', 'border': '1px solid lightgray', 'border-top-style': 'none'}
+tabtitle_style = {'padding': '2px', 'height': '28px', 'font-size': 'small'}
+tabtitle_selected_style = tabtitle_style.copy()
+tabtitle_selected_style.update ({'font-weight': 'bold'})
+popup_ts_style = {'opacity': '1', 'width': '90%', 'min-width': '1000px', 'min-height': '540px', 'margin-top': '150px', 'margin-left': 'auto', 'margin-right': 'auto', 'font-size': 'smaller'}
+
+## maps
 
 # some available map tiles
 map_tiles = [
@@ -48,8 +53,7 @@ data_vars = [
     {'label': 'T Percentile (monthly)',    'name': 'tair2m_r', 'cat': 'met',   'url': f'{forcing_url}/%Y/atir2m_r_%Y%m.png', 'cbar': f'{forcing_url}/tair2m_r_cbar.png'},
 ]
           
-###############################
-## site tools section
+## site lists
 
 all_stations = {'AMF': 'American River below Folsom Lake', 'ASP': 'Arroyo Seco near Pasadena', 'ASS': 'Arroyo Seco near Soledad', 'CSN': 'Cosumnes River at Michigan Bar', 'EFC': 'East Carson near Gardnerville', 'EWR': 'East Walker near Bridgeport', 'ERS': 'Eel River at Scotia', 'FTO': 'Feather River at Oroville', 'KWT': 'Kaweah River below Terminus reservoir', 'KRB': 'Kern River below City of Bakersfield', 'KRI': 'Kern River below Lake Isabella', 'KGF': 'Kings River below Pine Flat reservoir', 'KLO': 'Klamath River Copco to Orleans', 'MSS': 'McCloud River above Shasta Lake', 'MRC': 'Merced River below Merced Falls', 'MKM': 'Mokelumne River inflow to Pardee', 'NCD': 'Nacimiento below Nacimiento Dam', 'NPH': 'Napa River near St Helena', 'OWL': 'Owens River below Long Valley Dam', 'PSH': 'Pit River near Montgomerey and Squaw Creek', 'RRH': 'Russian River at Healdsburg', 'SBB': 'Sacramento R above Bend Bridge', 'SDT': 'Sacramento River at Delta', 'SRS': 'Salmon River at Somes Bar', 'SJF': 'San Joaquin River below Millerton Lake', 'ANM': 'Santa Ana River near Mentone', 'SSP': 'Sespe Creek near Fillmore', 'SIS': 'Shasta Lake Total Inflow', 'SNS': 'Stanislaus River below Goodwin', 'TNL': 'Trinity River near Lewiston Lake', 'TRF': 'Truckee River from Tahoe to Farad', 'SCC': 'Tule River below Lake Success', 'TLG': 'Tuolumne River below Lagrange reservoir', 'WFC': 'West Fork Carson at Woodfords', 'WWR': 'West Walker near Coleville', 'YRS': 'Yuba River near Smartsville'}
 
@@ -64,7 +68,4 @@ snow_pillow_stations = ['ADM', 'AGP', 'ALP', 'BCB', 'BCH', 'BFL', 'BGP', 'BIM', 
 
 snow_course_stations = ['3LK', 'ABN', 'ABY', 'ADI', 'AGP', 'ANR', 'APH', 'ASH', 'ATP', 'ATS', 'BBS', 'BCB', 'BCP', 'BDF', 'BEM', 'BFT', 'BGH', 'BHM', 'BHV', 'BKL', 'BLD', 'BLF', 'BLK', 'BLS', 'BLU', 'BMD', 'BMN', 'BMS', 'BNH', 'BNM', 'BNP', 'BNS', 'BOM', 'BP2', 'BP3', 'BSH', 'BSP', 'BV1', 'BWH', 'BWR', 'BXC', 'CAP', 'CBM', 'CBT', 'CC5', 'CCO', 'CDP', 'CFM', 'CHF', 'CHK', 'CHM', 'CHQ', 'CHU', 'CKT', 'CLM', 'CLT', 'CMC', 'CRA', 'CRF', 'CRM', 'CSV', 'CUR', 'CW1', 'CWP', 'CYT', 'DAN', 'DDF', 'DDM', 'DHC', 'DHM', 'DMN', 'DNS', 'DPO', 'DSM', 'DTL', 'DYM', 'ECS', 'EGM', 'ELL', 'EML', 'ENM', 'EPP', 'ERB', 'ETN', 'EUR', 'FBN', 'FCV', 'FDM', 'FEM', 'FLC', 'FLK', 'FNF', 'FNP', 'FOD', 'FP3', 'FRW', 'GBN', 'GEM', 'GFL', 'GFR', 'GL2', 'GML', 'GNL', 'GRZ', 'GYF', 'GYR', 'HCL', 'HCM', 'HHM', 'HIG', 'HKM', 'HLK', 'HLM', 'HMS', 'HRF', 'HRG', 'HRS', 'HRT', 'HS2', 'HTT', 'HYS', 'IHS', 'JCM', 'KRC', 'KSR', 'KTL', 'LB2', 'LCP', 'LCR', 'LKB', 'LLL', 'LLP', 'LMD', 'LSH', 'LTT', 'LWM', 'LXN', 'LYN', 'MAM', 'MB3', 'MBL', 'MCB', 'MCP', 'MD2', 'MDC', 'MDY', 'MHG', 'MLF', 'MMT', 'MN2', 'MNK', 'MNP', 'MRO', 'MSH', 'MSV', 'MUM', 'MWL', 'NFS', 'NGF', 'NGM', 'NLL', 'NMN', 'NRF', 'NTH', 'OEM', 'ONN', 'PDS', 'PDT', 'PFV', 'PGM', 'PHL', 'PLP', 'PMD', 'PNB', 'PPS', 'PRK', 'PRM', 'PSM', 'PTM', 'QKA', 'QRS', 'RBV', 'RC1', 'RC2', 'RC3', 'RCH', 'RCR', 'RCW', 'RDC', 'RDM', 'REL', 'RFM', 'RGT', 'RLD', 'RMD', 'RMM', 'RMR', 'RP1', 'RP2', 'RRM', 'RTT', 'RWL', 'RWM', 'SA2', 'SCE', 'SCF', 'SDL', 'SDM', 'SFT', 'SHM', 'SHW', 'SIB', 'SIL', 'SLM', 'SLT', 'SMD', 'SMT', 'SNF', 'SPD', 'SPF', 'SQ2', 'SRP', 'SSM', 'STM', 'STR', 'SVR', 'SWJ', 'SWL', 'SWM', 'SWT', 'TBC', 'TGP', 'THE', 'THL', 'TMF', 'TMK', 'TND', 'TNY', 'TRG', 'TRL', 'TUM', 'UBC', 'UCP', 'UKR', 'UTR', 'VLC', 'VNN', 'VRG', 'WBB', 'WBM', 'WDH', 'WHE', 'WHN', 'WLC', 'WLF', 'WLW', 'WPK', 'WR2', 'WRG', 'WRN', 'YBP']
 
-
-###############################
-## basin tools section
 

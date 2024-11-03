@@ -146,6 +146,12 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
             } else {
                 return ['assets/nwm_reaches_cnrfc_order4plus_0d001.pbf', false];
             }
+        },
+
+        // open the pop-up window for google doc
+        open_gdoc: function(n_clicks) {
+            return true;
         }
+
     }
 });

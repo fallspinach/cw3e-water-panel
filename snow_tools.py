@@ -1,6 +1,5 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
-import dash_leaflet as dl
 from dash_extensions.javascript import Namespace, arrow_function
 
 import plotly.express as px
@@ -9,7 +8,7 @@ import pandas as pd
 import numpy as np
 from datetime import date, datetime, timedelta
 
-from config import snow_course_stations, snow_pillow_stations, graph_config
+from config import snow_course_stations, snow_pillow_stations, graph_config, tool_style, tabtitle_style, tabtitle_selected_style, popup_ts_style
 
 # start to build maps
 ns = Namespace('dashExtensions', 'default')
@@ -61,12 +60,6 @@ def draw_pillow(staid, ptype):
     
 def get_snow_tools():
 
-    # tool panel
-    tool_style  = {'min-height': '312px', 'background-color': 'white', 'font-size': 'small', 'border': '1px solid lightgray', 'border-top-style': 'none'}
-
-    tabtitle_style          = {'padding': '2px', 'height': '28px', 'font-size': 'small'}
-    tabtitle_selected_style = {'padding': '2px', 'height': '28px', 'font-size': 'small', 'font-weight': 'bold'}
-
     ## pop-up window and its tabs/graphs
     fig_course_nrt   = draw_course('GRZ', 'nrt')
     fig_course_retro = draw_course('GRZ', 'retro')
@@ -77,9 +70,6 @@ def get_snow_tools():
     graph_pillow_nrt   = dcc.Graph(id='snow-graph-pillow-nrt',   figure=fig_pillow_nrt,   style={'height': '360px'}, config=graph_config)
     graph_pillow_retro = dcc.Graph(id='snow-graph-pillow-retro', figure=fig_pillow_retro, style={'height': '360px'}, config=graph_config)
 
-    tabtitle_style          = {'padding': '2px', 'height': '28px', 'font-size': 'small'}
-    tabtitle_selected_style = {'padding': '2px', 'height': '28px', 'font-size': 'small', 'font-weight': 'bold'}
-
     tab_course_nrt   = dcc.Tab(label='Snow Course + WRF-Hydro NRT',           value='snow-course-nrt',   children=[dcc.Loading(id='loading-snow-course-nrt',   children=graph_course_nrt)], style=tabtitle_style, selected_style=tabtitle_selected_style)
     tab_course_retro = dcc.Tab(label='Snow Course + WRF-Hydro Retrospective', value='snow-course-retro', children=[dcc.Loading(id='loading-snow-course-retro', children=graph_course_retro)], style=tabtitle_style, selected_style=tabtitle_selected_style)
     tab_pillow_nrt   = dcc.Tab(label='Snow Pillow + WRF-Hydro NRT',           value='snow-pillow-nrt',   children=[dcc.Loading(id='loading-snow-pillow-nrt',   children=graph_pillow_nrt)], style=tabtitle_style, selected_style=tabtitle_selected_style)
@@ -89,12 +79,10 @@ def get_snow_tools():
     popup_tabs_pillow = dcc.Tabs([tab_pillow_nrt, tab_pillow_retro], id='pillow-popup-tabs', value='snow-pillow-nrt')
     
     course_popup_plots = dbc.Offcanvas([popup_tabs_course],
-        title='Snow Courses', placement='top', is_open=False, scrollable=True, id='course-popup-plots',
-        style={'opacity': '0.9', 'width': '90%', 'min-width': '1000px', 'min-height': '540px', 'margin-top': '150px', 'margin-left': 'auto', 'margin-right': 'auto', 'font-size': 'smaller'}
+        title='Snow Courses', placement='top', is_open=False, scrollable=True, id='course-popup-plots', style=popup_ts_style
     )
     pillow_popup_plots = dbc.Offcanvas([popup_tabs_pillow],
-        title='Snow Pillows', placement='top', is_open=False, scrollable=True, id='pillow-popup-plots',
-        style={'opacity': '0.9', 'width': '90%', 'min-width': '1000px', 'min-height': '540px', 'margin-top': '150px', 'margin-left': 'auto', 'margin-right': 'auto', 'font-size': 'smaller'}
+        title='Snow Pillows', placement='top', is_open=False, scrollable=True, id='pillow-popup-plots', style=popup_ts_style
     )
 
     return course_popup_plots, pillow_popup_plots

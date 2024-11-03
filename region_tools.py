@@ -6,7 +6,7 @@ from dash_extensions.javascript import Namespace, arrow_function
 from datetime import date, datetime, timedelta
 import pandas as pd
 
-from config import map_tiles, data_vars
+from config import map_tiles, data_vars, tool_style, tabtitle_style, tabtitle_selected_style
 
 def get_region_tools():
     
@@ -85,7 +85,8 @@ def get_region_tools():
 
 
     # met variable tab
-    tab_style  = {'min-height': '72px', 'padding-top': '5px', 'background-color': 'white', 'font-size': 'small', 'border': '1px solid lightgray', 'border-top-style': 'none', 'margin-bottom': '10px'}
+    tab_style = tool_style.copy()
+    tab_style.update({'min-height': '72px', 'padding-top': '5px', 'margin-bottom': '10px'})
     item_style = {'margin': '5px 10px 2px 10px'}
     met_vars = [{'label': v['label'], 'value': v['name']} for v in data_vars if v['cat']=='met']
     met_tab = html.Div(dcc.RadioItems(options=met_vars, value=met_vars[0]['value'], id='met-vars', inputStyle=item_style, inline=True), style=tab_style)
@@ -93,11 +94,6 @@ def get_region_tools():
     # hydro variable tab
     hydro_vars = [{'label': v['label'], 'value': v['name']} for v in data_vars if v['cat']=='hydro']
     hydro_tab = html.Div(dcc.RadioItems(options=hydro_vars, value=hydro_vars[data_var_selected]['value'], id='hydro-vars', inputStyle=item_style, inline=True), style=tab_style)
-
-    # tabs for map layer selection
-    tabtitle_style          = {'padding': '2px', 'height': '28px', 'font-size': 'small'}
-    tabtitle_selected_style = tabtitle_style.copy()
-    tabtitle_selected_style.update ({'font-weight': 'bold'})
 
     control_data_sel = html.Div(dcc.Tabs([
         dcc.Tab(met_tab,   label='Meteorology', value='met',   style=tabtitle_style, selected_style=tabtitle_selected_style),

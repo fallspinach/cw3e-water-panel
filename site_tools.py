@@ -13,7 +13,7 @@ from dateutil.relativedelta import relativedelta
 from glob import glob
 import os
 
-from config import fnf_stations, fnf_id_names, graph_config
+from config import fnf_stations, fnf_id_names, graph_config, tabtitle_style, tabtitle_selected_style, popup_ts_style
 
 # flow retro figure
 def draw_retro(staid):
@@ -181,10 +181,6 @@ def get_site_tools():
     graph_mofor = dcc.Graph(id='graph-mofor', figure=fig_mofor, style={'height': '360px'}, config=graph_config)
     div_table = html.Div(id='div-table', children=table_fcst, style={'padding': '0px 50px 30px 50px', 'maxHeight': '350px', 'overflowY': 'scroll'})
 
-
-    tabtitle_style          = {'padding': '2px', 'height': '28px', 'font-size': 'small'}
-    tabtitle_selected_style = {'padding': '2px', 'height': '28px', 'font-size': 'small', 'font-weight': 'bold'}
-
     tab_retro = dcc.Tab(label='Retrospective',   value='retro', children=[dcc.Loading(id='loading-retro', children=graph_retro)], style=tabtitle_style, selected_style=tabtitle_selected_style)
     tab_mofor = dcc.Tab(label='NRT Monitor/Forecast',value='mofor', children=[dcc.Loading(id='loading-mofor', children=graph_mofor)], style=tabtitle_style, selected_style=tabtitle_selected_style)
     tab_table = dcc.Tab(label='Forecast Table',  value='table', children=[dcc.Loading(id='loading-table', children=div_table)],   style=tabtitle_style, selected_style=tabtitle_selected_style)
@@ -212,8 +208,7 @@ def get_site_tools():
     radio_block = html.Div(radio_pp, style={'vertical-align': 'top', 'display': 'inline-block'})
 
     popup_plots = dbc.Offcanvas([slider_text, slider_block, radio_text, radio_block, popup_tabs],
-        title='B-120 Forecast Point', placement='top', is_open=False, scrollable=True, id='popup-plots',
-        style={'opacity': '0.9', 'width': '90%', 'min-width': '1000px', 'min-height': '540px', 'margin-top': '150px', 'margin-left': 'auto', 'margin-right': 'auto', 'font-size': 'smaller'}
+        title='B-120 Forecast Point', placement='top', is_open=False, scrollable=True, id='popup-plots', style=popup_ts_style
     )
 
     return popup_plots

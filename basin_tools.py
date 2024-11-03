@@ -1,6 +1,5 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
-import dash_leaflet as dl
 from dash_extensions.javascript import Namespace, arrow_function
 
 import plotly.express as px
@@ -9,7 +8,7 @@ import pandas as pd
 import numpy as np
 from datetime import date, datetime, timedelta
 
-from config import fnf_stations, fnf_id_names, graph_config
+from config import fnf_stations, fnf_id_names, graph_config, tool_style, tabtitle_style, tabtitle_selected_style, popup_ts_style
 
 # start to build maps
 ns = Namespace('dashExtensions', 'default')
@@ -64,22 +63,20 @@ yaxis4=dict(title=dict(text="Total Soil Moisture (%)", font=dict(color='green'))
     
 def get_basin_tools():
 
-    # tool panel
-    tool_style  = {'min-height': '312px', 'background-color': 'white', 'font-size': 'small', 'border': '1px solid lightgray', 'border-top-style': 'none'}
-
     fig_system_status = draw_system_status()
     graph_system_status = dcc.Graph(id='graph-system_status', figure=fig_system_status, style={'height': '310px', 'padding-top': '10px'}, config=graph_config)
 
     # system status panel
     system_status_tab = html.Div([dcc.Loading(id='loading-system-status', children=graph_system_status)], style=tool_style)
 
-    tabtitle_style          = {'padding': '2px', 'height': '28px', 'font-size': 'small'}
-    tabtitle_selected_style = {'padding': '2px', 'height': '28px', 'font-size': 'small', 'font-weight': 'bold'}
-
+    flow_instructions = 'Click on any blue dots (B-120 inflow points) and a pop-up window will show up with three tabs: (1) composite time series plots that include WRF-Hydro NRT simulations (before and after bias corrections), Full Natural Flow (FNF), and ensemble forecasts with exceedance levels, (2) ensemble forecast data table, (3) retrospective WRF-Hydro simulations and FNF.'
+    snow_instructions = 'Click on the Map Layer Selection button on the upper right corner of the map region, then turn off the "Data" and "B-120 Basins" layers. Now you can click on any brown dots (Snow Courses) or orange dots (Snow Pillows) and a pup-up window will show up with two tabs in it: (1) the first tab compares WRF-Hydro NRT simulations to the site observations and (2) the second tab compares WRF-Hydro Retrospective simulations to the observations.'
+    sm_instructions   = 'Click on any basin polygon in the map region, and a pup-up window will appear with two tabs in it: (1) the first tab shows basin averaged time series of WRF-Hydro NRT simulations (Snow Water Equivalent and Total Soil Moisture) as well as forcing inputs (Precipitation and Temperature), and (2) the second tab shows the same basin averaged time series but for Retrospective WRF-Hydro simulations and forcing inputs. Caution: the Retrospective tab/figure contains a large amount of data and thus slow to load - a bit of patience needed.'
+    
     basin_tools = html.Div(dcc.Tabs([
-        dcc.Tab(html.Div(['Placeholder 1'], style=tool_style), label='Snowpack',      value='tab-snow', style=tabtitle_style, selected_style=tabtitle_selected_style),
-        dcc.Tab(html.Div(['Placeholder 2'], style=tool_style), label='Soil Moisture', value='tab-sm',   style=tabtitle_style, selected_style=tabtitle_selected_style),
-        dcc.Tab(html.Div(['Placeholder X'], style=tool_style), label='Tool X',        value='tab-x',    style=tabtitle_style, selected_style=tabtitle_selected_style),
+        dcc.Tab(html.Div([flow_instructions], style=tool_style), label='Streamflow',    value='tab-flow', style=tabtitle_style, selected_style=tabtitle_selected_style),
+        dcc.Tab(html.Div([snow_instructions], style=tool_style), label='Snowpack',      value='tab-snow', style=tabtitle_style, selected_style=tabtitle_selected_style),
+        dcc.Tab(html.Div([sm_instructions],   style=tool_style), label='Soil Moisture', value='tab-sm',   style=tabtitle_style, selected_style=tabtitle_selected_style),
         dcc.Tab([system_status_tab],  label='System Status', value='tab-status', style=tabtitle_style, selected_style=tabtitle_selected_style),
     ], value='tab-status'))
 
@@ -90,16 +87,12 @@ def get_basin_tools():
     graph_nrt  = dcc.Graph(id='basin-graph-nrt',   figure=fig_nrt,   style={'height': '360px'}, config=graph_config)
     graph_retro= dcc.Graph(id='basin-graph-retro', figure=fig_retro, style={'height': '360px'}, config=graph_config)
 
-    tabtitle_style          = {'padding': '2px', 'height': '28px', 'font-size': 'small'}
-    tabtitle_selected_style = {'padding': '2px', 'height': '28px', 'font-size': 'small', 'font-weight': 'bold'}
-
     tab_nrt   = dcc.Tab(label='NRT Monitor',  value='basin-nrt',   children=[dcc.Loading(id='loading-basin-nrt',  children=graph_nrt)],   style=tabtitle_style, selected_style=tabtitle_selected_style)
     tab_retro = dcc.Tab(label='Retrospective',value='basin-retro', children=[dcc.Loading(id='loading-basin-retro', children=graph_retro)], style=tabtitle_style, selected_style=tabtitle_selected_style)
 
     popup_tabs = dcc.Tabs([tab_nrt, tab_retro], id='basin-popup-tabs', value='basin-nrt')
     basin_popup_plots = dbc.Offcanvas([popup_tabs],
-        title='B-120 Basin', placement='top', is_open=False, scrollable=True, id='basin-popup-plots',
-        style={'opacity': '0.9', 'width': '90%', 'min-width': '1000px', 'min-height': '540px', 'margin-top': '150px', 'margin-left': 'auto', 'margin-right': 'auto', 'font-size': 'smaller'}
+        title='B-120 Basin', placement='top', is_open=False, scrollable=True, id='basin-popup-plots', style=popup_ts_style
     )
 
     return basin_tools, basin_popup_plots

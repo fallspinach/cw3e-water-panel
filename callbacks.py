@@ -186,3 +186,13 @@ def update_pillow(site):
     
     return [fig_pillow_nrt, fig_pillow_retro, True, stain]
 
+# callback to open the pop-up window for google doc
+app.clientside_callback(
+    ClientsideFunction(
+        namespace='clientside',
+        function_name='open_gdoc'
+    ),
+    Output('gdoc-popup', 'is_open'),
+    Input('gdoc-button', 'n_clicks')
+)
+

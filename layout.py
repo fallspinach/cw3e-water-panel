@@ -4,7 +4,8 @@ import dash_bootstrap_components as dbc
 from region_tools import get_region_tools
 from site_tools   import get_site_tools
 from basin_tools  import get_basin_tools
-from snow_tools import get_snow_tools
+from snow_tools   import get_snow_tools
+from docs_links   import get_docs_links
 
 def get_layout():
 
@@ -12,6 +13,7 @@ def get_layout():
     popup_plots = get_site_tools()
     [basin_tools, basin_popup_plots] = get_basin_tools()
     [course_popup_plots, pillow_popup_plots] = get_snow_tools()
+    [gdoc_popup, docs_links] = get_docs_links()
     
     panel_layout = dbc.Container([
             dbc.Row([
@@ -20,6 +22,7 @@ def get_layout():
                     dbc.Row(control_data_sel),
                     dbc.Row(control_time_sel),
                     dbc.Row([basin_tools, basin_popup_plots]),
+                    dbc.Row([docs_links, gdoc_popup])
                 ], width=4)
             ])
         ], fluid=True,
