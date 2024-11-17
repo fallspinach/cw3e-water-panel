@@ -13,12 +13,12 @@ from dateutil.relativedelta import relativedelta
 from glob import glob
 import os
 
-from config import fnf_stations, fnf_id_names, graph_config, tabtitle_style, tabtitle_selected_style, popup_ts_style
+from config import base_url, fnf_stations, fnf_id_names, graph_config, tabtitle_style, tabtitle_selected_style, popup_ts_style
 
 # flow retro figure
 def draw_retro(staid):
     if staid in fnf_stations:
-        fcsv = f'data/retro/combined/{staid}_monthly.csv'
+        fcsv = f'{base_url}/data/retro/combined/{staid}_monthly.csv'
         df = pd.read_csv(fcsv, parse_dates=True, index_col='Date')
         fig_retro = px.line(df, labels={'Date': '', 'value': 'Flow (kaf/mon)'})
         fig_retro = go.Figure()
@@ -29,22 +29,23 @@ def draw_retro(staid):
         fig_retro = px.line(x=[2018, 2023], y=[0, 0], labels={'x': 'Data not available.', 'y': 'Flow (kaf/mon)'})
     fig_retro.update_layout(margin=dict(l=15, r=15, t=15, b=5),
                             plot_bgcolor='#eeeeee',
-                            legend=dict(title='', yanchor='top', y=0.99, xanchor='right', x=0.99),
+                            legend=dict(title='', bgcolor='rgba(255,255,255,0.7)', yanchor='top', y=0.99, xanchor='right', x=0.99),
                             hovermode='x unified') #, font=dict(size=20))
-    fig_retro.update_xaxes(range=['1979-07-01', '2024-03-31'])
+    fig_retro.update_xaxes(range=['1979-10-01', '2024-09-30'])
     fig_retro.update_yaxes(title='Flow (kaf/mon)')
     fig_retro.update_traces(hovertemplate=None)
     return fig_retro
     
 # flow monitor/forecast figure
 def draw_mofor(staid, fcst_type, fcst_t1, fcst_t2, fcst_update):
-    nens = len(glob(f'data/fcst/init{fcst_t1:%Y%m%d}_update{fcst_update:%Y%m%d}/??'))
+    #nens = len(glob(f'{base_url}/data/fcst/init{fcst_t1:%Y%m%d}_update{fcst_update:%Y%m%d}/??'))
+    nens = 45
     if staid in fnf_stations:
-        fcsv = f'data/fcst/init{fcst_t1:%Y%m%d}_update{fcst_update:%Y%m%d}/basins/{fcst_type}/{staid}_{fcst_t1:%Y%m%d}-{fcst_t2:%Y%m%d}.csv'
+        fcsv = f'{base_url}/data/fcst/init{fcst_t1:%Y%m%d}_update{fcst_update:%Y%m%d}/basins/{fcst_type}/{staid}_{fcst_t1:%Y%m%d}-{fcst_t2:%Y%m%d}.csv'
         df = pd.read_csv(fcsv, parse_dates=True, index_col='Date', usecols = ['Date']+['Ens%02d' % (i+1) for i in range(nens)]+['Avg', 'Exc50', 'Exc90', 'Exc10'])
         if fcst_t2.month>=7:
             df.drop(index=df.index[-1], axis=0, inplace=True)
-        fcsv2 = f'data/nrt/combined/{staid}_monthly.csv'
+        fcsv2 = f'{base_url}/data/nrt/combined/{staid}_monthly.csv'
         df2 = pd.read_csv(fcsv2, parse_dates=True, index_col='Date', usecols=['Date', 'FNF', 'Qsim', 'Qmatch'])
         fig_mofor = go.Figure()
         for e in range(1, nens+1):
@@ -60,7 +61,8 @@ def draw_mofor(staid, fcst_type, fcst_t1, fcst_t2, fcst_update):
         fig_mofor.add_trace(go.Scatter(x=df2.index, y=df2['Qmatch'], name='CDF-matched', mode='lines', line=go.scatter.Line(color=px.colors.qualitative.Prism[7])))#, visible='legendonly'))
     else:
         fig_mofor = px.line(x=[2018, 2023], y=[0, 0], labels={'x': 'Data not available.', 'y': 'Flow (kaf/mon)'})
-    fig_mofor.update_layout(margin=dict(l=15, r=15, t=15, b=5), plot_bgcolor='#eeeeee', legend=dict(title='', yanchor='top', y=0.99, xanchor='right', x=0.99), hovermode='x unified')
+    fig_mofor.update_layout(margin=dict(l=15, r=15, t=15, b=5), plot_bgcolor='#eeeeee',
+                            legend=dict(title='', bgcolor='rgba(255,255,255,0.7)', yanchor='top', y=0.99, xanchor='right', x=0.99), hovermode='x unified')
     fig_mofor.update_yaxes(title='Flow (kaf/mon)')
     fig_mofor.update_traces(hovertemplate=None)
     return fig_mofor
@@ -70,7 +72,7 @@ def draw_mofor(staid, fcst_type, fcst_t1, fcst_t2, fcst_update):
 def draw_table(staid, staname, fcst_type, fcst_t1, fcst_t2, fcst_update):
     cols = ['Date', 'Exc50', 'Pav50', 'Exc90', 'Pav90', 'Exc10', 'Pav10', 'Avg']
     if staid in fnf_stations:
-        fcsv = f'data/fcst/init{fcst_t1:%Y%m%d}_update{fcst_update:%Y%m%d}/basins/{fcst_type}/{staid}_{fcst_t1:%Y%m%d}-{fcst_t2:%Y%m%d}.csv'
+        fcsv = f'{base_url}/data/fcst/init{fcst_t1:%Y%m%d}_update{fcst_update:%Y%m%d}/basins/{fcst_type}/{staid}_{fcst_t1:%Y%m%d}-{fcst_t2:%Y%m%d}.csv'
         df = pd.read_csv(fcsv, parse_dates=False, usecols=cols)
         df = df[cols]
         cols.remove('Date')
@@ -79,7 +81,7 @@ def draw_table(staid, staname, fcst_type, fcst_t1, fcst_t2, fcst_update):
         if fcst_t2.month>=7:
             df.iloc[-1, 0] = df.iloc[-1, 0].replace('July', 'April-July total')
     else:
-        fcsv = f'data/fcst/init{fcst_t1:%Y%m%d}_update{fcst_update:%Y%m%d}/basins/{fcst_type}/{staid}_{fcst_t1:%Y%m%d}-{fcst_t2:%Y%m%d}.csv'
+        fcsv = f'{base_url}/data/fcst/init{fcst_t1:%Y%m%d}_update{fcst_update:%Y%m%d}/basins/{fcst_type}/{staid}_{fcst_t1:%Y%m%d}-{fcst_t2:%Y%m%d}.csv'
         df = pd.read_csv(fcsv, parse_dates=False, usecols=cols)
         df = df[cols]
         df.drop(df.index, inplace=True)
@@ -109,7 +111,7 @@ def draw_table_all(fcst_type, fcst_t1, fcst_t2, fcst_update):
     cnt = 0
     for staid,staname in fnf_id_names.items():
         cols = ['Date', 'Exc50', 'Pav50', 'Exc90', 'Pav90', 'Exc10', 'Pav10', 'Avg']
-        fcsv = f'data/fcst/init{fcst_t1:%Y%m%d}_update{fcst_update:%Y%m%d}/basins/{fcst_type}/{staid}_{fcst_t1:%Y%m%d}-{fcst_t2:%Y%m%d}.csv'
+        fcsv = f'{base_url}/data/fcst/init{fcst_t1:%Y%m%d}_update{fcst_update:%Y%m%d}/basins/{fcst_type}/{staid}_{fcst_t1:%Y%m%d}-{fcst_t2:%Y%m%d}.csv'
         df = pd.read_csv(fcsv, parse_dates=False, usecols=cols)
         df = df[cols]
         cols.remove('Date')
@@ -152,8 +154,7 @@ def draw_table_all(fcst_type, fcst_t1, fcst_t2, fcst_update):
 
 def get_site_tools():
 
-    fcsv = 'data/system_status.csv'
-    df_system_status = pd.read_csv(fcsv, parse_dates=True)
+    df_system_status = pd.read_csv(f'{base_url}/data/system_status.csv', parse_dates=True)
     
     fcst_t1 = datetime.fromisoformat(df_system_status['ESP-WWRF Fcst'][0]).date()
     fcst_t2 = datetime.fromisoformat(df_system_status['ESP-WWRF Fcst'][1]).date()
@@ -165,7 +166,9 @@ def get_site_tools():
     # find all forecasts in the current year
     tup1 = datetime(fcst_t1.year, 1, 1)
     tup2 = datetime(fcst_t1.year, 12, 1)
-    dt_updates = [datetime.strptime(os.path.basename(d).split('_')[-1], 'update%Y%m%d') for d in glob(f'data/fcst/init*_update{fcst_t1:%Y}*')]
+    dt_updates = [datetime.strptime(os.path.basename(d).split('_')[-1], 'update%Y%m%d') for d in glob(f'{base_url}/data/fcst/init*_update{fcst_t1:%Y}*')]
+    #df_esp_wwrf_updates = pd.read_csv(f'{base_url}/data/esp_wwrf_updates.csv', parse_dates=True, names=['Date'])
+    #dt_updates = pd.to_datetime(df_esp_wwrf_updates['Date']).to_list()
     dt_updates.sort()
     tup_latest = dt_updates[-1]
     #print(dt_updates)

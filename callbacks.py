@@ -8,6 +8,8 @@ import pandas as pd
 from site_tools import draw_retro, draw_mofor, draw_table, draw_table_all
 from basin_tools import draw_basin_ts
 from snow_tools import draw_course, draw_pillow
+from river_tools import draw_mofor_river_db
+from config import base_url
 ## Callbacks from here on
 
 # callback to update data var in the title section
@@ -86,8 +88,7 @@ app.clientside_callback(
 @app.callback(Output(component_id='datepicker', component_property='max_date_allowed'),
               Input('interval-check_system', 'n_intervals'))
 def update_system_status(basin):
-    fcsv = 'data/system_status.csv'
-    df_status = pd.read_csv(fcsv, parse_dates=True)
+    df_status = pd.read_csv(f'{base_url}/data/system_status.csv', parse_dates=True)
     return datetime.fromisoformat(df_status['WRF-Hydro NRT'][1]).date()
 
 # callback to switch river vector sources according to zoom level
@@ -111,8 +112,7 @@ app.clientside_callback(
               Input('slider_updates', 'value'),
               Input('radio_pp', 'value'))
 def update_flows(fcst_point, yday_update, pp):
-    fcsv = 'data/system_status.csv'
-    df_system_status = pd.read_csv(fcsv, parse_dates=True)
+    df_system_status = pd.read_csv(f'{base_url}/data/system_status.csv', parse_dates=True)
     fcst_t1 = datetime.fromisoformat(df_system_status['ESP-WWRF Fcst'][0]).date()
     fcst_t2 = datetime.fromisoformat(df_system_status['ESP-WWRF Fcst'][1]).date()
     if fcst_point==None:
@@ -186,6 +186,27 @@ def update_pillow(site):
     
     return [fig_pillow_nrt, fig_pillow_retro, True, stain]
 
+# create/update streamflow time series for rivers
+@app.callback(Output(component_id='graph-mofor-river', component_property='figure'),
+              Output('popup-plots-river', 'is_open'),
+              Output('popup-plots-river', 'title'),
+              Input('nwm-rivers', 'clickData'))
+def update_flows_river(fcst_point):
+
+    if 'feature_id' in fcst_point['properties']:
+        rivid = fcst_point['properties']['feature_id']
+        rivin = fcst_point['properties']['tooltip']
+        pop = True
+    else:
+        rivid = ''
+        rivin = ''
+        pop = False
+        
+    fig_mofor_river = draw_mofor_river_db(rivid)
+    
+    return [fig_mofor_river, pop, rivin]
+
+
 # callback to open the pop-up window for google doc
 app.clientside_callback(
     ClientsideFunction(
@@ -196,3 +217,12 @@ app.clientside_callback(
     Input('gdoc-button', 'n_clicks')
 )
 
+# callback to open the pop-up window for forcing doc
+app.clientside_callback(
+    ClientsideFunction(
+        namespace='clientside',
+        function_name='open_fdoc'
+    ),
+    Output('fdoc-popup', 'is_open'),
+    Input('fdoc-button', 'n_clicks')
+)

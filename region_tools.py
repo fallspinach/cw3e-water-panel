@@ -6,12 +6,11 @@ from dash_extensions.javascript import Namespace, arrow_function
 from datetime import date, datetime, timedelta
 import pandas as pd
 
-from config import map_tiles, data_vars, tool_style, tabtitle_style, tabtitle_selected_style
+from config import base_url, map_tiles, domain_config, data_vars, tool_style, tabtitle_style, tabtitle_selected_style
 
 def get_region_tools():
     
-    fcsv = 'data/system_status.csv'
-    df_system_status = pd.read_csv(fcsv, parse_dates=True)
+    df_system_status = pd.read_csv(f'{base_url}/data/system_status.csv', parse_dates=True)
     
     last_whnrt = datetime.fromisoformat(df_system_status['WRF-Hydro NRT'][1]).date()
     #last_whnrt = datetime.fromisoformat(df_system_status['WRF-Hydro Monitor'][1]).date()
@@ -57,21 +56,19 @@ def get_region_tools():
                              hideout=dict(circleOptions=dict(fillOpacity=1, color='white', weight=2, radius=3), colorscale=['orange'], colorProp='Elevation', min=0, max=20000))
 
     # image data overlay
-    if last_whnrt.month>7 and last_whnrt.month<11:
+    if last_whnrt.month>7 and last_whnrt.month<12:
         data_var_selected = 1
     else:
         data_var_selected = 0
-    cnrfc_domain = [[32, -125], [44, -113]]
-    basins24_domain = [[35, -124], [42, -117]]
     img_url  = last_whnrt.strftime(data_vars[data_var_selected]['url'])
     cbar_url = data_vars[data_var_selected]['cbar']
-    data_map = dl.ImageOverlay(id='data-img', url=img_url, bounds=basins24_domain, opacity=0.7)
+    data_map = dl.ImageOverlay(id='data-img', url=img_url, bounds=domain_config['bounds'], opacity=0.7)
     # color bar
     data_cbar = html.Div(html.Img(src=cbar_url, title='Color Bar', id='data-cbar-img'), id='data-cbar',
                          style={'position': 'absolute', 'left': '18px', 'top': '140px', 'z-index': '500'})
 
     layers_region = [dl.Overlay([data_map, data_cbar], id='data-map-ol',  name='Data',   checked=True),
-                     #dl.Overlay(cnrfc_bound,      id='region-ol', name='Region', checked=True),
+                     dl.Overlay(cnrfc_bound,      id='region-ol', name='Region', checked=True),
                      dl.Overlay(nwm_rivers,       id='rivers-ol', name='Rivers', checked=False),
                      dl.Overlay(b120_watersheds,  id='basins-ol', name='B120 Basins', checked=True),
                      dl.Overlay(b120_points,      id='sites-ol',  name='B120 Sites',  checked=True),
@@ -80,7 +77,7 @@ def get_region_tools():
                  
     # region map on the left
     map_region = dl.Map([map_tiles[1], locator, dl.LayersControl(layers_region)], id='map-region',
-                        center=[38.7, -121], zoom=7,
+                        center=domain_config['center'], zoom=domain_config['zoom'],
                         style={'width': '100%', 'height': '100%', 'min-height': '780px', 'min-width': '700px', 'margin': '0px', 'display': 'block'})
 
 

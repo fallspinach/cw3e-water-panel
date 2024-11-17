@@ -8,15 +8,14 @@ import pandas as pd
 import numpy as np
 from datetime import date, datetime, timedelta
 
-from config import fnf_stations, fnf_id_names, graph_config, tool_style, tabtitle_style, tabtitle_selected_style, popup_ts_style
+from config import base_url, fnf_stations, fnf_id_names, graph_config, tool_style, tabtitle_style, tabtitle_selected_style, popup_ts_style
 
 # start to build maps
 ns = Namespace('dashExtensions', 'default')
 
 # draw system status chart
 def draw_system_status():
-    fcsv = 'data/system_status.csv'
-    df_system_status = pd.read_csv(fcsv, parse_dates=True)
+    df_system_status = pd.read_csv(f'{base_url}/data/system_status.csv', parse_dates=True)
     fig_system_status = go.Figure()
     i = 1
     for datastream,datatime in df_system_status.items():
@@ -39,18 +38,22 @@ def draw_system_status():
 # draw basin average time series
 def draw_basin_ts(staid, ptype):
     if staid in fnf_stations:
-        fcsv = f'data/{ptype}/averaged/{staid}_daily.csv'
+        fcsv = f'{base_url}/data/{ptype}/averaged/{staid}_daily.csv'
         df = pd.read_csv(fcsv, parse_dates=True, index_col='Date')
         fig_nrt = go.Figure()
         fig_nrt.add_trace(go.Bar(x=df.index, y=df['PREC'], name='Precipitation'))
         fig_nrt.add_trace(go.Scatter(x=df.index, y=df['T2D'], name='Air Temperature', mode='markers', line=go.scatter.Line(color='orange'), yaxis='y2'))
         fig_nrt.add_trace(go.Scatter(x=df.index, y=df['SWE'], name='Snow Water Equivalent', mode='lines', line=go.scatter.Line(color='magenta'), yaxis='y3'))
         fig_nrt.add_trace(go.Scatter(x=df.index, y=df['SMTOT']*100, name='Total Soil Moisture', mode='lines', line=go.scatter.Line(color='green'), yaxis='y4'))
+        if ptype=='retro':
+            xrange = [df.index[0].to_pydatetime()-timedelta(days=150), df.index[-1].to_pydatetime()+timedelta(days=150)]
+        else:
+            xrange = [df.index[0].to_pydatetime()-timedelta(days=10), df.index[-1].to_pydatetime()+timedelta(days=10)]
     else:
         fig_nrt = px.line(x=[2018, 2023], y=[0, 0], labels={'x': 'Data not available.', 'y': ''})
-    fig_nrt.update_layout(margin=dict(l=15, r=15, t=15, b=5),
+    fig_nrt.update_layout(margin=dict(l=15, r=15, t=15, b=5), xaxis_range=xrange,
                           plot_bgcolor='#eeeeee',
-                          legend=dict(title='', yanchor='top', y=0.99, xanchor='right', x=0.92),
+                          legend=dict(title='', bgcolor='rgba(255,255,255,0.7)', yanchor='top', y=0.99, xanchor='right', x=0.92),
                           hovermode='x unified',
 xaxis=dict(domain=[0.07, 0.93]),
 yaxis =dict(title=dict(text='Precipitation (mm/day)', font=dict(color='blue')), tickfont=dict(color='blue')),

@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from datetime import date, datetime, timedelta
 
-from config import snow_course_stations, snow_pillow_stations, graph_config, tool_style, tabtitle_style, tabtitle_selected_style, popup_ts_style
+from config import base_url, snow_course_stations, snow_pillow_stations, graph_config, tool_style, tabtitle_style, tabtitle_selected_style, popup_ts_style
 
 # start to build maps
 ns = Namespace('dashExtensions', 'default')
@@ -17,9 +17,9 @@ ns = Namespace('dashExtensions', 'default')
 # draw snow course time series
 def draw_course(staid, ptype):
     if staid in snow_course_stations:
-        fcsv = f'data/cdec/snow_course/SWE_monthly_{staid}.csv'
+        fcsv = f'{base_url}/data/cdec/snow_course/SWE_monthly_{staid}.csv'
         df = pd.read_csv(fcsv, parse_dates=True, index_col='Date')
-        fcsv2 = f'data/{ptype}/sites/{staid}.csv'
+        fcsv2 = f'{base_url}/data/{ptype}/sites/{staid}.csv'
         df2 = pd.read_csv(fcsv2, parse_dates=True, index_col='Date')
         fig_course = go.Figure()
         fig_course.add_trace(go.Scatter(x=df.index, y=df['SWE'], name='Snow Course SWE', mode='lines+markers', line=go.scatter.Line(color='black')))
@@ -29,7 +29,7 @@ def draw_course(staid, ptype):
         fig_course = px.line(x=[2018, 2023], y=[0, 0], labels={'x': 'Data not available.', 'y': ''})
     fig_course.update_layout(margin=dict(l=15, r=15, t=15, b=5), xaxis_range=xrange,
                           plot_bgcolor='#eeeeee',
-                          legend=dict(title='', yanchor='top', y=0.99, xanchor='right', x=0.99),
+                          legend=dict(title='', bgcolor='rgba(255,255,255,0.7)', yanchor='top', y=0.99, xanchor='right', x=0.99),
                           hovermode='x unified') #, font=dict(size=20))
     fig_course.update_yaxes(title='Snow Water Equivalent (in)')
     fig_course.update_traces(hovertemplate=None)
@@ -38,10 +38,10 @@ def draw_course(staid, ptype):
 # draw snow pillow time series
 def draw_pillow(staid, ptype):
     if staid in snow_pillow_stations:
-        fcsv = f'data/cdec/snow_pillow/SWE_daily_{staid}.csv'
+        fcsv = f'{base_url}/data/cdec/snow_pillow/SWE_daily_{staid}.csv'
         df = pd.read_csv(fcsv, parse_dates=True, index_col='Date')
         df.drop(df[(df['SWE']<-10)|(df['SWE']>200)].index, inplace=True)
-        fcsv2 = f'data/{ptype}/sites/{staid}.csv'
+        fcsv2 = f'{base_url}/data/{ptype}/sites/{staid}.csv'
         df2 = pd.read_csv(fcsv2, parse_dates=True, index_col='Date')
         fig_course = go.Figure()
         fig_course.add_trace(go.Scatter(x=df.index, y=df['SWE'], name='Snow Pillow SWE', mode='lines', line=go.scatter.Line(color='black')))
@@ -51,7 +51,7 @@ def draw_pillow(staid, ptype):
         fig_course = px.line(x=[2018, 2023], y=[0, 0], labels={'x': 'Data not available.', 'y': ''})
     fig_course.update_layout(margin=dict(l=15, r=15, t=15, b=5), xaxis_range=xrange,
                           plot_bgcolor='#eeeeee',
-                          legend=dict(title='', yanchor='top', y=0.99, xanchor='right', x=0.99),
+                          legend=dict(title='', bgcolor='rgba(255,255,255,0.7)', yanchor='top', y=0.99, xanchor='right', x=0.99),
                           hovermode='x unified') #, font=dict(size=20))
     fig_course.update_yaxes(title='Snow Water Equivalent (in)')
     fig_course.update_traces(hovertemplate=None)

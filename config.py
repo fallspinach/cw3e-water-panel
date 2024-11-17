@@ -8,12 +8,14 @@ from datetime import datetime
 ## global configs
 
 # system status
-#base_url = 'https://cw3e.ucsd.edu/wrf_hydro/cnrfc/' # easier to update the data but slow to load
-#base_url = 'https://storage.googleapis.com/cw3e-water-panel.appspot.com/'
-base_url = '/static/'
-#fcsv = f'{base_url}imgs/monitor/system_status.csv'
-fcsv = 'data/system_status.csv'
+cloud_url = 'https://storage.googleapis.com/cw3e-water-panel.appspot.com'
+base_url = '.'
+fcsv = f'{base_url}/data/system_status.csv'
 df_system_status = pd.read_csv(fcsv, parse_dates=True)
+
+# map domain setup
+domain_config = {'bounds': [[32, -125], [44, -113]], 'center': [38.2, -119], 'zoom': 6}    # cnrfc
+#domain_config = {'bounds': [[35, -124], [42, -117]], 'center': [38.7, -121], 'zoom': 7}    # basins24
 
 # image snapshot export options
 graph_config = {'toImageButtonOptions': {'format': 'png', 'filename': 'cw3e_water_panel_plot', 'scale': 3}, 'displaylogo': False} 
@@ -42,8 +44,8 @@ map_tiles = [
 ]
 
 ## data variables
-output_url  = f'{base_url}imgs/monitor/output'
-forcing_url = f'{base_url}imgs/monitor/forcing'
+output_url  = f'{cloud_url}/imgs/monitor/output'
+forcing_url = f'{cloud_url}/imgs/monitor/forcing'
 data_vars = [
     {'label': 'SWE Percentile (daily)',    'name': 'swe_r',    'cat': 'hydro', 'url': f'{output_url}/%Y/swe_r_%Y%m%d.png',   'cbar': f'{output_url}/swe_r_cbar.png'},
     {'label': '2-m SM Percentile (daily)', 'name': 'smtot_r',  'cat': 'hydro', 'url': f'{output_url}/%Y/smtot_r_%Y%m%d.png', 'cbar': f'{output_url}/smtot_r_cbar.png'},

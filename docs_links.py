@@ -15,21 +15,43 @@ def get_docs_links():
                        width='98%', height='98%')
     gdoc_popup = dbc.Offcanvas([gdoc],
         title='CW3E WRF-Hydro Environment Documentation', placement='top', is_open=False, scrollable=True, id='gdoc-popup',
-        style={'opacity': '1', 'width': '900px', 'height': '95%', 'margin-top': '50px', 'margin-left': 'auto', 'margin-right': 'auto', 'font-size': 'smaller'}
+        style={'opacity': '1', 'width': '900px', 'height': '100%', 'margin-top': '0px', 'margin-left': 'auto', 'margin-right': 'auto', 'font-size': 'smaller'}
     )
+    fdoc = html.Iframe(src='https://docs.google.com/document/d/e/2PACX-1vShtg6sapWHonjKVLASFBa_AIfEP66SkrG6HDXuSK095rcYpDbRxSI05eadaTvwFIiEw6fE2VIjAAN2/pub?embedded=true',
+                       width='98%', height='98%')
+    fdoc_popup = dbc.Offcanvas([fdoc],
+        title='CW3E Forcing Documentation', placement='top', is_open=False, scrollable=True, id='fdoc-popup',
+        style={'opacity': '1', 'width': '900px', 'height': '100%', 'margin-top': '0px', 'margin-left': 'auto', 'margin-right': 'auto', 'font-size': 'smaller'}
+    )
+    
+    gdoc_row = dbc.Row([
+        dbc.Col([dbc.Button('System Documentation', id='gdoc-button', size='sm', outline=True, color='primary', className='me-1', style={'margin': 'auto'})], width=4),
+        dbc.Col(['Click "5. Web app (Dash) for interactive visualizations" under "Table of Contents".'])
+    ], className='g-0', style={'font-size': 'small', 'margin-top': '10px'})
+    fdoc_row = dbc.Row([
+        dbc.Col([dbc.Button('Forcing Documentation', id='fdoc-button', size='sm', outline=True, color='primary', className='me-1', style={'margin': 'auto'})], width=4),
+        dbc.Col(['Google Doc for CW3E forcing in a pop-up window.'])
+    ], className='g-0', style={'font-size': 'small', 'margin-top': '5px'})
+    
+    scode_row = dbc.Row([
+        dbc.Col([dbc.Button('System Source Code', href='https://github.com/fallspinach/nrt_hydro/', external_link=True, id='scode-button', size='sm', outline=True, color='primary', className='me-1', style={'margin': 'auto'})], width=4),
+        dbc.Col(['System source code on GitHub (leave this page or right-click for "open in new tab").'])
+    ], className='g-0', style={'font-size': 'small', 'margin-top': '5px'})
+    wcode_row = dbc.Row([
+        dbc.Col([dbc.Button('Web App Source Code', href='https://github.com/fallspinach/cw3e-water-panel/', external_link=True, id='wcode-button', size='sm', outline=True, color='primary', className='me-1', style={'margin': 'auto'})], width=4),
+        dbc.Col(['Web app source code on GitHub (leave this page or right-click for "open in new tab").'])
+    ], className='g-0', style={'font-size': 'small', 'margin-top': '5px'})
 
+    docs = dbc.Stack([gdoc_row, fdoc_row, scode_row, wcode_row])
+    
     tab_style = tool_style.copy()
     tab_style.update({'min-height': '180px', 'padding-top': '20px', 'text-align': 'center'})
     
-    docs = html.Div([dbc.Button('Documentation', id='gdoc-button', outline=True, color='primary', className='me-1'),
-                     html.P('Click the button to open the Google Doc in a pop-up window, then click "5. Web app (Dash) for interactive visualizations" in the "Table of Contents" to go to Section 5.'),
-    ], style=tab_style)
-
     links = html.Div([''], style=tab_style)
-    
+
     docs_links = html.Div(dcc.Tabs([
         dcc.Tab(docs,  label='Documentation', value='tab-docs',  style=tabtitle_style, selected_style=tabtitle_selected_style),
         dcc.Tab(links, label='Links',         value='tab-links', style=tabtitle_style, selected_style=tabtitle_selected_style),
     ], style={'margin-top': '10px'}, value='tab-docs'))
 
-    return gdoc_popup, docs_links
+    return gdoc_popup, fdoc_popup, docs_links
