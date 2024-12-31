@@ -106,7 +106,8 @@ app.clientside_callback(
 @app.callback(Output(component_id='graph-retro', component_property='figure'),
               Output(component_id='graph-mofor', component_property='figure'),
               Output(component_id='div-table', component_property='children'),
-              Output(component_id='graph-map', component_property='figure'),
+              Output(component_id='graph-mapb', component_property='figure'),
+              Output(component_id='graph-mapp', component_property='figure'),
               Output('popup-plots', 'is_open'),
               Output('popup-plots', 'title'),
               Input('b120-points', 'clickData'),
@@ -133,9 +134,9 @@ def update_flows(fcst_point, yday_update, pp):
         table_fcst = draw_table(staid, all_stations[staid], fcst_type, fcst_t1, fcst_t2, fcst_update)
     else:
         table_fcst = draw_table_all(fcst_type, fcst_t1, fcst_t2, fcst_update)
-    fig_map = draw_map(fcst_type, fcst_t1, fcst_t2, fcst_update)
+    [fig_mapb, fig_mapp] = draw_map(fcst_type, fcst_t1, fcst_t2, fcst_update)
     
-    return [fig_retro, fig_mofor, table_fcst, fig_map, True, stain]
+    return [fig_retro, fig_mofor, table_fcst, fig_mapb, fig_mapp, True, stain]
 
 # create/update historic time series graph in popup
 @app.callback(Output(component_id='basin-graph-nrt',   component_property='figure'),
