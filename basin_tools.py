@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from datetime import date, datetime, timedelta
 
-from config import base_url, fnf_stations, fnf_id_names, graph_config, tool_style, tabtitle_style, tabtitle_selected_style, popup_ts_style
+from config import base_url, fnf_stations, fnf_id_names, graph_config, tool_style, tabtitle_style, tabtitle_selected_style, popup_ts_style, fig_ts_style
 
 # start to build maps
 ns = Namespace('dashExtensions', 'default')
@@ -87,8 +87,8 @@ def get_basin_tools():
     staid0     = 'FTO'    
     fig_nrt    = draw_basin_ts(staid0, 'nrt')
     fig_retro  = draw_basin_ts(staid0, 'retro')
-    graph_nrt  = dcc.Graph(id='basin-graph-nrt',   figure=fig_nrt,   style={'height': '360px'}, config=graph_config)
-    graph_retro= dcc.Graph(id='basin-graph-retro', figure=fig_retro, style={'height': '360px'}, config=graph_config)
+    graph_nrt  = dcc.Graph(id='basin-graph-nrt',   figure=fig_nrt,   style=fig_ts_style, config=graph_config)
+    graph_retro= dcc.Graph(id='basin-graph-retro', figure=fig_retro, style=fig_ts_style, config=graph_config)
 
     tab_nrt   = dcc.Tab(label='NRT Monitor',  value='basin-nrt',   children=[dcc.Loading(id='loading-basin-nrt',  children=graph_nrt)],   style=tabtitle_style, selected_style=tabtitle_selected_style)
     tab_retro = dcc.Tab(label='Retrospective',value='basin-retro', children=[dcc.Loading(id='loading-basin-retro', children=graph_retro)], style=tabtitle_style, selected_style=tabtitle_selected_style)

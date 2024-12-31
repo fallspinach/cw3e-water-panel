@@ -12,7 +12,7 @@ import numpy as np
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-from config import base_url, graph_config, tabtitle_style, tabtitle_selected_style, popup_ts_style
+from config import base_url, graph_config, tabtitle_style, tabtitle_selected_style, popup_ts_style, fig_ts_style
 
     
 # flow monitor/forecast figure
@@ -141,8 +141,8 @@ def get_river_tools():
     fig_mofor_river = draw_mofor_river_db('342455')
     fig_rev_esp     = draw_rev_esp('342455')
 
-    graph_mofor_river = dcc.Graph(id='graph-mofor-river', figure=fig_mofor_river, style={'height': '360px'}, config=graph_config)
-    graph_rev_esp     = dcc.Graph(id='graph-rev-esp',     figure=fig_rev_esp,     style={'height': '360px'}, config=graph_config)
+    graph_mofor_river = dcc.Graph(id='graph-mofor-river', figure=fig_mofor_river, style=fig_ts_style, config=graph_config)
+    graph_rev_esp     = dcc.Graph(id='graph-rev-esp',     figure=fig_rev_esp,     style=fig_ts_style, config=graph_config)
 
     tab_mofor_river = dcc.Tab(label='Monitor/Forecast',value='mofor-river',  children=[dcc.Loading(id='loading-mofor-river', children=graph_mofor_river)], style=tabtitle_style, selected_style=tabtitle_selected_style)
     tab_rev_esp     = dcc.Tab(label='Reverse ESP Experiment',value='rev-esp', children=[dcc.Loading(id='loading-rev-esp',    children=graph_rev_esp)],    style=tabtitle_style, selected_style=tabtitle_selected_style)

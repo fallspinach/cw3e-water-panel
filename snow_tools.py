@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from datetime import date, datetime, timedelta
 
-from config import base_url, snow_course_stations, snow_pillow_stations, graph_config, tool_style, tabtitle_style, tabtitle_selected_style, popup_ts_style
+from config import base_url, snow_course_stations, snow_pillow_stations, graph_config, tool_style, tabtitle_style, tabtitle_selected_style, popup_ts_style, fig_ts_style
 
 # start to build maps
 ns = Namespace('dashExtensions', 'default')
@@ -65,10 +65,10 @@ def get_snow_tools():
     fig_course_retro = draw_course('GRZ', 'retro')
     fig_pillow_nrt   = draw_pillow('RTL', 'nrt')
     fig_pillow_retro = draw_pillow('RTL', 'retro')
-    graph_course_nrt   = dcc.Graph(id='snow-graph-course-nrt',   figure=fig_course_nrt,   style={'height': '360px'}, config=graph_config)
-    graph_course_retro = dcc.Graph(id='snow-graph-course-retro', figure=fig_course_retro, style={'height': '360px'}, config=graph_config)
-    graph_pillow_nrt   = dcc.Graph(id='snow-graph-pillow-nrt',   figure=fig_pillow_nrt,   style={'height': '360px'}, config=graph_config)
-    graph_pillow_retro = dcc.Graph(id='snow-graph-pillow-retro', figure=fig_pillow_retro, style={'height': '360px'}, config=graph_config)
+    graph_course_nrt   = dcc.Graph(id='snow-graph-course-nrt',   figure=fig_course_nrt,   style=fig_ts_style, config=graph_config)
+    graph_course_retro = dcc.Graph(id='snow-graph-course-retro', figure=fig_course_retro, style=fig_ts_style, config=graph_config)
+    graph_pillow_nrt   = dcc.Graph(id='snow-graph-pillow-nrt',   figure=fig_pillow_nrt,   style=fig_ts_style, config=graph_config)
+    graph_pillow_retro = dcc.Graph(id='snow-graph-pillow-retro', figure=fig_pillow_retro, style=fig_ts_style, config=graph_config)
 
     tab_course_nrt   = dcc.Tab(label='Snow Course + WRF-Hydro NRT',           value='snow-course-nrt',   children=[dcc.Loading(id='loading-snow-course-nrt',   children=graph_course_nrt)], style=tabtitle_style, selected_style=tabtitle_selected_style)
     tab_course_retro = dcc.Tab(label='Snow Course + WRF-Hydro Retrospective', value='snow-course-retro', children=[dcc.Loading(id='loading-snow-course-retro', children=graph_course_retro)], style=tabtitle_style, selected_style=tabtitle_selected_style)

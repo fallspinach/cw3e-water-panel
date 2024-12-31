@@ -13,7 +13,7 @@ from dateutil.relativedelta import relativedelta
 from glob import glob
 import os, json
 
-from config import base_url, domain_config, fnf_stations, fnf_id_names, graph_config, tabtitle_style, tabtitle_selected_style, popup_ts_style, geojson_basins, geojson_points
+from config import base_url, domain_config, fnf_stations, fnf_id_names, graph_config, tabtitle_style, tabtitle_selected_style, popup_ts_style, fig_ts_style, geojson_basins, geojson_points
 
 # flow retro figure
 def draw_retro(staid):
@@ -216,8 +216,8 @@ def get_site_tools():
     
     [fig_b, fig_p] = draw_map(fcst_type0, fcst_t1, fcst_t2, tup_latest)
 
-    graph_retro = dcc.Graph(id='graph-retro', figure=fig_retro, style={'height': '400px', 'padding-top': '30px'}, config=graph_config)
-    graph_mofor = dcc.Graph(id='graph-mofor', figure=fig_mofor, style={'height': '400px', 'padding-top': '30px'}, config=graph_config)
+    graph_retro = dcc.Graph(id='graph-retro', figure=fig_retro, style=fig_ts_style, config=graph_config)
+    graph_mofor = dcc.Graph(id='graph-mofor', figure=fig_mofor, style=fig_ts_style, config=graph_config)
     div_table = html.Div(id='div-table', children=table_fcst, style={'padding': '0px 50px 30px 50px', 'maxHeight': '470px', 'overflowY': 'scroll'})
     graph_mapb  = dcc.Graph(id='graph-mapb', figure=fig_b, style={'height': '460px', 'width': '500px', 'padding-top': '0px', 'padding-bottom': '0px', 'margin': 'auto'}, config=graph_config)
     graph_mapp  = dcc.Graph(id='graph-mapp', figure=fig_p, style={'height': '460px', 'width': '500px', 'padding-top': '0px', 'padding-bottom': '0px', 'margin': 'auto'}, config=graph_config)
