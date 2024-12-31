@@ -11,9 +11,9 @@ import numpy as np
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from glob import glob
-import os
+import os, json
 
-from config import base_url, fnf_stations, fnf_id_names, graph_config, tabtitle_style, tabtitle_selected_style, popup_ts_style
+from config import base_url, domain_config, fnf_stations, fnf_id_names, graph_config, tabtitle_style, tabtitle_selected_style, popup_ts_style
 
 # flow retro figure
 def draw_retro(staid):
@@ -152,6 +152,35 @@ def draw_table_all(fcst_type, fcst_t1, fcst_t2, fcst_update):
 
     return [table_fcst]
 
+def draw_map(fcst_type, fcst_t1, fcst_t2, fcst_update):
+    with open('assets/fnf_watershed_proj_tooltip_24.geojson', 'r') as f:
+        basins = json.load(f)
+    for i in range(len(basins['features'])):
+        basins['features'][i]['id'] = basins['features'][i]['properties']['Station']
+    cnt = 0
+    for staid,staname in fnf_id_names.items():
+        cols = ['Date', 'Exc50', 'Pav50', 'Exc90', 'Pav90', 'Exc10', 'Pav10', 'Avg']
+        fcsv = f'{base_url}/data/fcst/init{fcst_t1:%Y%m%d}_update{fcst_update:%Y%m%d}/basins/{fcst_type}/{staid}_{fcst_t1:%Y%m%d}-{fcst_t2:%Y%m%d}.csv'
+        df = pd.read_csv(fcsv, parse_dates=False, usecols=cols, dtype={'Date': str})
+        df = df.tail(1)
+        df = df.rename(columns={'Date': 'StationID'})
+        df.iloc[-1, 0] = staid
+        if cnt==0:
+            df_all = df
+        else:
+            df_all = pd.concat([df_all, df], ignore_index=True)
+        cnt += 1
+    #print(df_all.dtypes)
+    #print(df_all.head())
+    fig = px.choropleth_map(df_all, geojson=basins, locations='StationID', color='Pav50',
+                           color_continuous_scale='BrBG', range_color=(0, 200),
+                           map_style='carto-positron', opacity=0.7,
+                           zoom=5.2, center = {'lat': domain_config['center'][0]+0.45, 'lon': domain_config['center'][1]-2},
+                           labels={'Pav50': 'Median forecast as % of historical aveverage', 'Exc50': 'Median forecast in KAF'}
+                          )
+    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, coloraxis_colorbar=dict(titleside="right"))
+    return fig
+
 def get_site_tools():
 
     df_system_status = pd.read_csv(f'{base_url}/data/system_status.csv', parse_dates=True)
@@ -164,8 +193,12 @@ def get_site_tools():
     staname0   = 'Feather River at Oroville'
 
     # find all forecasts in the current year
-    tup1 = datetime(fcst_t1.year, 1, 1)
-    tup2 = datetime(fcst_t1.year, 12, 1)
+    if fcst_t1.month>=10:
+        tup1 = datetime(fcst_t1.year, 12, 1)
+        tup2 = datetime(fcst_t1.year+1, 7, 1)
+    else:
+        tup1 = datetime(fcst_t1.year-1, 10, 1)
+        tup2 = datetime(fcst_t1.year, 7, 31)
     dt_updates = [datetime.strptime(os.path.basename(d).split('_')[-1], 'update%Y%m%d') for d in glob(f'{base_url}/data/fcst/init*_update{fcst_t1:%Y}*')]
     #df_esp_wwrf_updates = pd.read_csv(f'{base_url}/data/esp_wwrf_updates.csv', parse_dates=True, names=['Date'])
     #dt_updates = pd.to_datetime(df_esp_wwrf_updates['Date']).to_list()
@@ -179,20 +212,24 @@ def get_site_tools():
     fig_mofor = draw_mofor(staid0, fcst_type0, fcst_t1, fcst_t2, tup_latest)
 
     table_fcst = draw_table(staid0, staname0, fcst_type0, fcst_t1, fcst_t2, tup_latest)
+    
+    fig_map = draw_map(fcst_type0, fcst_t1, fcst_t2, tup_latest)
 
-    graph_retro = dcc.Graph(id='graph-retro', figure=fig_retro, style={'height': '360px'}, config=graph_config)
-    graph_mofor = dcc.Graph(id='graph-mofor', figure=fig_mofor, style={'height': '360px'}, config=graph_config)
-    div_table = html.Div(id='div-table', children=table_fcst, style={'padding': '0px 50px 30px 50px', 'maxHeight': '350px', 'overflowY': 'scroll'})
+    graph_retro = dcc.Graph(id='graph-retro', figure=fig_retro, style={'height': '400px', 'padding-top': '30px'}, config=graph_config)
+    graph_mofor = dcc.Graph(id='graph-mofor', figure=fig_mofor, style={'height': '400px', 'padding-top': '30px'}, config=graph_config)
+    div_table = html.Div(id='div-table', children=table_fcst, style={'padding': '0px 50px 30px 50px', 'maxHeight': '470px', 'overflowY': 'scroll'})
+    graph_map   = dcc.Graph(id='graph-map', figure=fig_map, style={'height': '460px', 'width': '700px', 'padding-top': '0px', 'padding-bottom': '0px', 'margin': 'auto'}, config=graph_config)
 
     tab_retro = dcc.Tab(label='Retrospective',   value='retro', children=[dcc.Loading(id='loading-retro', children=graph_retro)], style=tabtitle_style, selected_style=tabtitle_selected_style)
     tab_mofor = dcc.Tab(label='NRT Monitor/Forecast',value='mofor', children=[dcc.Loading(id='loading-mofor', children=graph_mofor)], style=tabtitle_style, selected_style=tabtitle_selected_style)
     tab_table = dcc.Tab(label='Forecast Table',  value='table', children=[dcc.Loading(id='loading-table', children=div_table)],   style=tabtitle_style, selected_style=tabtitle_selected_style)
+    tab_map   = dcc.Tab(label='Forecast Map',  value='map', children=[dcc.Loading(id='loading-map', children=graph_map)],   style=tabtitle_style, selected_style=tabtitle_selected_style)
 
-    popup_tabs = dcc.Tabs([tab_mofor, tab_table, tab_retro], id='popup-tabs', value='mofor')
+    popup_tabs = dcc.Tabs([tab_mofor, tab_table, tab_map, tab_retro], id='popup-tabs', value='mofor')
 
-    slider_updates = dcc.Slider(min=tup1.timetuple().tm_yday, max=tup2.timetuple().tm_yday, step=None,
-        marks={dt.timetuple().tm_yday: dt.strftime('%-m/%-d') for dt in dt_updates},
-        value=tup_latest.timetuple().tm_yday,
+    slider_updates = dcc.Slider(min=0, max=203, step=None,
+        marks={(dt-tup1).days: dt.strftime('%-m/%-d') for dt in dt_updates},
+        value=(tup_latest-tup1).days, #.timetuple().tm_yday,
         id='slider_updates'
     )
 
@@ -204,7 +241,7 @@ def get_site_tools():
            {'label': ' CDF Match', 'value': 'cdfm'},
            {'label': ' LSTM',      'value': 'lstm'},
        ],
-       value='cdfm', labelStyle={'padding-right': 10}, id='radio_pp'
+       value='lstm', labelStyle={'padding-right': 10}, id='radio_pp'
     )
 
     radio_text  = html.Div('Post-Processing: ', style={'display': 'inline-block', 'font-weight': 'bold', 'vertical-align': 'top', 'padding-right': 10})

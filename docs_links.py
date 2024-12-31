@@ -34,12 +34,12 @@ def get_docs_links():
     ], className='g-0', style={'font-size': 'small', 'margin-top': '5px'})
     
     scode_row = dbc.Row([
-        dbc.Col([dbc.Button('System Source Code', href='https://github.com/fallspinach/nrt_hydro/', external_link=True, id='scode-button', size='sm', outline=True, color='primary', className='me-1', style={'margin': 'auto'})], width=4),
-        dbc.Col(['System source code on GitHub (leave this page or right-click for "open in new tab").'])
+        dbc.Col([dbc.Button('System Source Code', href='https://github.com/fallspinach/nrt_hydro/', target='_blank', id='scode-button', size='sm', outline=True, color='primary', className='me-1', style={'margin': 'auto'})], width=4),
+        dbc.Col(['System source code on GitHub (open in a new tab/window).'])
     ], className='g-0', style={'font-size': 'small', 'margin-top': '5px'})
     wcode_row = dbc.Row([
-        dbc.Col([dbc.Button('Web App Source Code', href='https://github.com/fallspinach/cw3e-water-panel/', external_link=True, id='wcode-button', size='sm', outline=True, color='primary', className='me-1', style={'margin': 'auto'})], width=4),
-        dbc.Col(['Web app source code on GitHub (leave this page or right-click for "open in new tab").'])
+        dbc.Col([dbc.Button('Web App Source Code', href='https://github.com/fallspinach/cw3e-water-panel/', target='_blank', id='wcode-button', size='sm', outline=True, color='primary', className='me-1', style={'margin': 'auto'})], width=4),
+        dbc.Col(['Web app source code on GitHub (open in a new tab/window).'])
     ], className='g-0', style={'font-size': 'small', 'margin-top': '5px'})
 
     docs = dbc.Stack([gdoc_row, fdoc_row, scode_row, wcode_row])

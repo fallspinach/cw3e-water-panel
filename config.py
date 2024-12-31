@@ -25,7 +25,7 @@ tool_style = {'min-height': '312px', 'background-color': 'white', 'font-size': '
 tabtitle_style = {'padding': '2px', 'height': '28px', 'font-size': 'small'}
 tabtitle_selected_style = tabtitle_style.copy()
 tabtitle_selected_style.update ({'font-weight': 'bold'})
-popup_ts_style = {'opacity': '1', 'width': '90%', 'min-width': '1000px', 'min-height': '540px', 'margin-top': '150px', 'margin-left': 'auto', 'margin-right': 'auto', 'font-size': 'smaller'}
+popup_ts_style = {'opacity': '1', 'width': '90%', 'min-width': '1000px', 'min-height': '630px', 'margin-top': '50px', 'margin-left': 'auto', 'margin-right': 'auto', 'font-size': 'smaller'}
 
 ## maps
 

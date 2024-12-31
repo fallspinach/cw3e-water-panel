@@ -5,10 +5,10 @@ from dash.dependencies import ClientsideFunction, Input, Output, State
 from datetime import datetime, timedelta
 import pandas as pd
 
-from site_tools import draw_retro, draw_mofor, draw_table, draw_table_all
+from site_tools import draw_retro, draw_mofor, draw_table, draw_table_all, draw_map
 from basin_tools import draw_basin_ts
 from snow_tools import draw_course, draw_pillow
-from river_tools import draw_mofor_river_db
+from river_tools import draw_mofor_river_db, draw_rev_esp
 from config import base_url
 ## Callbacks from here on
 
@@ -106,6 +106,7 @@ app.clientside_callback(
 @app.callback(Output(component_id='graph-retro', component_property='figure'),
               Output(component_id='graph-mofor', component_property='figure'),
               Output(component_id='div-table', component_property='children'),
+              Output(component_id='graph-map', component_property='figure'),
               Output('popup-plots', 'is_open'),
               Output('popup-plots', 'title'),
               Input('b120-points', 'clickData'),
@@ -121,7 +122,10 @@ def update_flows(fcst_point, yday_update, pp):
     else:
         staid = fcst_point['properties']['Station_ID']
         stain = fcst_point['properties']['tooltip']
-    fcst_update = datetime(fcst_t1.year, 1, 1) + timedelta(days=yday_update-1)
+    if fcst_t1.month>=10:
+        fcst_update = datetime(fcst_t1.year, 12, 1) + timedelta(days=yday_update)
+    else:
+        fcst_update = datetime(fcst_t1.year-1, 12, 1) + timedelta(days=yday_update)
     fcst_type = f'{pp}'
     fig_retro = draw_retro(staid)
     fig_mofor = draw_mofor(staid, fcst_type, fcst_t1, fcst_t2, fcst_update)
@@ -129,8 +133,9 @@ def update_flows(fcst_point, yday_update, pp):
         table_fcst = draw_table(staid, all_stations[staid], fcst_type, fcst_t1, fcst_t2, fcst_update)
     else:
         table_fcst = draw_table_all(fcst_type, fcst_t1, fcst_t2, fcst_update)
+    fig_map = draw_map(fcst_type, fcst_t1, fcst_t2, fcst_update)
     
-    return [fig_retro, fig_mofor, table_fcst, True, stain]
+    return [fig_retro, fig_mofor, table_fcst, fig_map, True, stain]
 
 # create/update historic time series graph in popup
 @app.callback(Output(component_id='basin-graph-nrt',   component_property='figure'),
@@ -188,6 +193,7 @@ def update_pillow(site):
 
 # create/update streamflow time series for rivers
 @app.callback(Output(component_id='graph-mofor-river', component_property='figure'),
+              Output(component_id='graph-rev-esp',     component_property='figure'),
               Output('popup-plots-river', 'is_open'),
               Output('popup-plots-river', 'title'),
               Input('nwm-rivers', 'clickData'))
@@ -203,8 +209,9 @@ def update_flows_river(fcst_point):
         pop = False
         
     fig_mofor_river = draw_mofor_river_db(rivid)
+    fig_rev_esp     = draw_rev_esp(rivid)
     
-    return [fig_mofor_river, pop, rivin]
+    return [fig_mofor_river, fig_rev_esp, pop, rivin]
 
 
 # callback to open the pop-up window for google doc

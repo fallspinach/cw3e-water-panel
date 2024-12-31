@@ -14,7 +14,7 @@ def get_region_tools():
     
     last_whnrt = datetime.fromisoformat(df_system_status['WRF-Hydro NRT'][1]).date()
     #last_whnrt = datetime.fromisoformat(df_system_status['WRF-Hydro Monitor'][1]).date()
-    data_start = date(2024, 5, 1)
+    data_start = date(2023, 10, 1)
 
     # start to build maps
     ns = Namespace('dashExtensions', 'default')
