@@ -198,9 +198,10 @@ def get_site_tools():
         tup1 = datetime(fcst_t1.year, 12, 1)
         tup2 = datetime(fcst_t1.year+1, 7, 1)
     else:
-        tup1 = datetime(fcst_t1.year-1, 10, 1)
-        tup2 = datetime(fcst_t1.year, 7, 31)
-    dt_updates = [datetime.strptime(os.path.basename(d).split('_')[-1], 'update%Y%m%d') for d in glob(f'{base_url}/data/fcst/init*_update{fcst_t1:%Y}*')]
+        tup1 = datetime(fcst_t1.year-1, 12, 1)
+        tup2 = datetime(fcst_t1.year, 7, 1)
+    dt_updates = [datetime.strptime(os.path.basename(d).split('_')[-1], 'update%Y%m%d') for d in glob(f'{base_url}/data/fcst/init*_update{tup1:%Y}*')]
+    dt_updates.extend([datetime.strptime(os.path.basename(d).split('_')[-1], 'update%Y%m%d') for d in glob(f'{base_url}/data/fcst/init*_update{tup2:%Y}*')])
     #df_esp_wwrf_updates = pd.read_csv(f'{base_url}/data/esp_wwrf_updates.csv', parse_dates=True, names=['Date'])
     #dt_updates = pd.to_datetime(df_esp_wwrf_updates['Date']).to_list()
     dt_updates.sort()

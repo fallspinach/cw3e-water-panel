@@ -3,6 +3,7 @@ from config import all_stations, fnf_stations
 
 from dash.dependencies import ClientsideFunction, Input, Output, State
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 import pandas as pd
 
 from site_tools import draw_retro, draw_mofor, draw_table, draw_table_all, draw_map
@@ -117,16 +118,23 @@ def update_flows(fcst_point, yday_update, pp):
     df_system_status = pd.read_csv(f'{base_url}/data/system_status.csv', parse_dates=True)
     fcst_t1 = datetime.fromisoformat(df_system_status['ESP-WWRF Fcst'][0]).date()
     fcst_t2 = datetime.fromisoformat(df_system_status['ESP-WWRF Fcst'][1]).date()
+    if fcst_t1.month>=10:
+        fcst_update = datetime(fcst_t1.year, 12, 1) + timedelta(days=yday_update)
+    else:
+        fcst_update = datetime(fcst_t1.year-1, 12, 1) + timedelta(days=yday_update)
+    # re-derive fcst_t1 and fcst_t2 from fcst_update
+    fcst_t1 = datetime(fcst_update.year, fcst_update.month, 1)
+    fcst_t2 = fcst_t1 + relativedelta(months=6) - timedelta(days=1)
+    if fcst_t1.month==1:
+        fcst_t2 = fcst_t1 + relativedelta(months=7) - timedelta(days=1)
+    elif fcst_t1.month==12:
+        fcst_t2 = fcst_t1 + relativedelta(months=8) - timedelta(days=1)
     if fcst_point==None:
         staid = 'FTO'
         stain = 'FTO: Feather River at Oroville'
     else:
         staid = fcst_point['properties']['Station_ID']
         stain = fcst_point['properties']['tooltip']
-    if fcst_t1.month>=10:
-        fcst_update = datetime(fcst_t1.year, 12, 1) + timedelta(days=yday_update)
-    else:
-        fcst_update = datetime(fcst_t1.year-1, 12, 1) + timedelta(days=yday_update)
     fcst_type = f'{pp}'
     fig_retro = draw_retro(staid)
     fig_mofor = draw_mofor(staid, fcst_type, fcst_t1, fcst_t2, fcst_update)
